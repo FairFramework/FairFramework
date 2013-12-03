@@ -55,9 +55,8 @@ class Stream
             }
         }
 
-        $resultTemplate = $original->toXml();
-
-        $resultTemplate = str_replace('<?xml version="1.0"?>', '', $resultTemplate);
+        $data = Transport::get($this->path);
+        $resultTemplate = '<!DOCTYPE html>' . "\n" . $original->toHtml(null, 0, $data, $data);
 
         return $resultTemplate;
     }
@@ -65,12 +64,12 @@ class Stream
     private function replace($matches)
     {
         $arguments = $this->parseArguments($matches[1]);
-        $path = $matches[2];
+        $value = $matches[2];
 
         $data = Transport::get($this->path);
         if ($data) {
             $uiTypeRender = $this->getUiTypeRender($arguments);
-            return $uiTypeRender->render($data->get($path), $arguments);
+            return $uiTypeRender->render($value, $arguments);
         }
     }
 

@@ -22,7 +22,11 @@ class Data extends \stdClass
 
     public function __set($key, $value)
     {
-        $this->$key = $value;
+        if (is_array($value)) {
+            $this->$key = new Data($value);
+        } else {
+            $this->$key = $value;
+        }
     }
     
     public function __get($key)

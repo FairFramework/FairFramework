@@ -226,16 +226,33 @@ class Configuration implements ConfigurationInterface
         return $value;
     }
 
+    private function replaceWithData($search, $data, $default)
+    {
+        $search = (string) $search;
+        $try = $data->get($search);
+        if ($try) {
+            return $try;
+        } else {
+            return (string) $default;
+        }
+    }
+
     /**
      * @param \SimpleXMLElement $element
      * @param int $level
+     * @param \stdClass $data
+     * @param \stdClass $globalData
      * @return string
      */
-    public function toXml(\SimpleXMLElement $element = null, $level = 0)
+    public function toHtml(\SimpleXMLElement $element = null, $level = 0, \stdClass $data, \stdClass $globalData)
     {
         if ($element === null) {
             $element = $this->config;
         }
+
+        $replaceGlobal = function ($matches) use ($globalData) {
+            return $this->replaceWithData($matches[1], $globalData, '');
+        };
 
         $elementName = $element->getName();
 
@@ -251,42 +268,81 @@ class Configuration implements ConfigurationInterface
 
         $attributes = $element->attributes();
         if ($attributes) {
-            foreach ($attributes as $key=>$value) {
-                $out .= ' '.$key.'="'.str_replace('"', '\"', (string)$value).'"';
+            foreach ($attributes as $key => $value) {
+                $value = preg_replace_callback('#\$\((.*?)\)#',
+                    function ($matches) use ($globalData) {
+                        return $this->replaceWithData($matches[1], $globalData, '');
+                    }, $value);
+
+                $value = preg_replace_callback('#\@\((.*?)\)#',
+                    function ($matches) use ($data) {
+                        return $this->replaceWithData($matches[1], $data, '');
+                    }
+                    , $value);
+                $out .= ' ' . $key . '="' . str_replace('"', '\"', $value) . '"';
+
+                if ($key === 'if') {
+                    if (empty($value)) {
+                        return '';
+                    }
+                }
+                if ($key === 'nif') {
+                    if (!empty($value)) {
+                        return '';
+                    }
+                }
             }
         }
 
-        $attributes = $element->attributes('xsi', true);
-        if ($attributes) {
-            foreach ($attributes as $key=>$value) {
-                $out .= ' xsi:'.$key.'="'.str_replace('"', '\"', (string)$value).'"';
+        $xsiAttributes = $element->attributes('xsi', true);
+        if ($xsiAttributes) {
+            foreach ($xsiAttributes as $key => $value) {
+                $value = preg_replace_callback('#\$\((.*?)\)#', $replaceGlobal, $value);
+                $out .= ' xsi:' . $key . '="' . str_replace('"', '\"', $value) . '"';
             }
         }
 
-        if ($this->hasChildren($element)) {
-            $out .= '>';
-            $value = trim((string)$element);
-            if (strlen($value)) {
-                $out .= $this->xmlentities($value);
+        if (in_array($elementName, $this->singleTagElements)) {
+            $out .= '/>' . $nl;
+            return $out;
+        }
+
+        $out .= '>';
+
+        if ($this->getAttribute($element, 'data-collection')) {
+            $name = (string)$this->getAttribute($element, 'data-collection');
+            $collection = $data->get($name);
+        }
+        if (!isset($collection)) {
+            $collection = array($data);
+        }
+
+        foreach ($collection as $item) {
+            if ($this->hasChildren($element)) {
+                $value = trim((string)$element);
+                if (strlen($value)) {
+                    $out .= $this->xmlentities($value);
+                }
+                $out .= $nl;
+                foreach ($element->children() as $child) {
+                    $out .= $this->toHtml($child, $level+1, $item, $globalData);
+                }
+                $out .= $pad;
             }
-            $out .= $nl;
-            foreach ($element->children() as $child) {
-                $out .= $this->toXml($child, $level+1);
-            }
-            $out .= $pad . '</' . $elementName . '>' . $nl;
-        } else {
             $value = (string)$element;
             if (strlen($value)) {
-                $out .= '>' . $this->xmlentities($value) . '</' . $elementName . '>' . $nl;
-            } else {
-                if (in_array($elementName, $this->singleTagElements)) {
-                    $out .= '/>' . $nl;
-                } else {
-                    $out .= '></' . $elementName . '>' . $nl;
-                }
+                $replace = function ($matches) use ($item) {
+                    return $this->replaceWithData($matches[1], $item, '');
+                };
 
+                $value = preg_replace_callback('#\@\((.*?)\)#', $replace, $value);
+                $value = preg_replace_callback('#\$\((.*?)\)#', $replaceGlobal, $value);
+
+                $out .= $this->xmlentities($value);
             }
         }
+
+        $out .= '</' . $elementName . '>' . $nl;
 
         return $out;
     }
