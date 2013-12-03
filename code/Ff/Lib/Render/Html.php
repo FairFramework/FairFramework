@@ -33,13 +33,31 @@ class Html
             include 'ff.template.phtml://' . $path;
         };
         
-        $data = new \Ff\Lib\Data();
+        $data = new Data();
 
         $code = $resource->getCode();
         $data->$code = $resource;
 
         $data->system = $this->getSystemData();
 
+        $data->topmenu = $this->getTopMenuData();
+
+        Transport::set($path, $data);
+
+        $render($data);
+    }
+
+    private function getSystemData()
+    {
+        $data = array(
+            'charset' => 'utf-8',
+            'lang' => 'en'
+        );
+        return new Data($data);
+    }
+
+    private function getTopMenuData()
+    {
         $items = array(
             array(
                 'title' => 'Item 1',
@@ -54,22 +72,10 @@ class Html
                 )
             ),
             array(
-                'title' => 'Item 2'
+                'title' => 'Edit',
+                'command' => 'edit'
             )
         );
-        $data->topmenu = new Data($items);
-
-        Transport::set($path, $data);
-
-        $render($data);
-    }
-
-    private function getSystemData()
-    {
-        $data = array(
-            'charset' => 'utf-8',
-            'lang' => 'en'
-        );
-        return new Data($data);
+        return new Data($items);
     }
 }

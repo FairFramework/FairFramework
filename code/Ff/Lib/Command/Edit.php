@@ -6,7 +6,7 @@ use Ff\Api\ContextInterface;
 use Ff\Lib\Bus;
 use Ff\Runtime\Resource;
 
-class View
+class Edit
 {
     /**
      *

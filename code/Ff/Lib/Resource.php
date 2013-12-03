@@ -30,7 +30,7 @@ class Resource extends \stdClass
     {
         $this->bus = $bus;
 
-        $config = $this->bus->configuration()->get('resource/page');
+        $config = $this->bus->configuration()->get('resource/' . $this->code);
         $this->config = new Data($config);
     }
 

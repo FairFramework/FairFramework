@@ -26,9 +26,14 @@ class Resource
     {
         return $this->bus->getInstance('resource/product');
     }
-    
+
     public function page()
     {
         return $this->bus->getInstance('resource/page');
+    }
+
+    public function admin()
+    {
+        return $this->bus->getInstance('resource/admin');
     }
 }

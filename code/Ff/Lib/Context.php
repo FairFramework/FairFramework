@@ -119,6 +119,19 @@ class Context implements ContextInterface
                 parse_str($arguments, $params);
                 $this->params = $params;
             }
+
+            $uri = ltrim($this->uri, '/');
+            if (empty($uri)) {
+                $resourceName = 'page';
+                $resourceIdentity = 'home';
+            } else {
+                $uriArray = explode('/', $uri);
+                $resourceName = array_shift($uriArray);
+                $resourceIdentity = array_shift($uriArray);
+            }
+
+            $this->params['resource_name'] = $resourceName;
+            $this->params['resource_identity'] = $resourceIdentity;
         }
     }
 }

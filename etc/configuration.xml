@@ -10,6 +10,10 @@
             <class>Ff\Lib\Command\Create</class>
             <is_secure>true</is_secure>
         </create>
+        <edit>
+            <class>Ff\Lib\Command\Edit</class>
+            <is_secure>true</is_secure>
+        </edit>
         <view>
             <class>Ff\Lib\Command\View</class>
             <is_secure>false</is_secure>
@@ -39,7 +43,7 @@
         </product>
         <page label="Static Page" type="entity">
             <class>Ff\Module\Page\Resource\Page</class>
-            <limit>0</limit>
+            <ui_template>StaticPage</ui_template>
         </page>
         <cart label="Shopping Cart" type="entity">
             <class>Ff\Module\Ecommerce\Resource\Cart</class>
@@ -52,6 +56,8 @@
         <account label="User Account" type="area">
         </account>
         <admin label="Administration Panel" type="area">
+            <class>Ff\Module\Admin\Resource\AdminPanel</class>
+            <ui_template>AdminPage</ui_template>
         </admin>
     </resource>
 

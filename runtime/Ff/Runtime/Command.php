@@ -62,4 +62,13 @@ class Command
     {
         return $this->bus->getInstance('command/view');
     }
+
+    /**
+     *
+     * @return \Ff\Lib\Command\Edit
+     */
+    public function edit()
+    {
+        return $this->bus->getInstance('command/edit');
+    }
 }
