@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+
+<configuration>
+    <configuration>
+        <class>Ff\Lib\Configuration</class>
+    </configuration>
+    
+    <resource label="Global Resources">
+        <category label="Catalog Category" type="entity">
+            <class>Ff\Module\Catalog\Resource\Category</class>
+            <limit>0</limit>
+        </category>
+        <product label="Catalog Product" type="entity">
+            <class>Ff\Module\Catalog\Resource\Product</class>
+            <limit>0</limit>
+        </product>
+        <page label="Static Page" type="entity">
+            <class>Ff\Module\Page\Resource\Page</class>
+            <limit>0</limit>
+        </page>
+        <cart label="Shopping Cart" type="entity">
+            <class>Ff\Module\Ecommerce\Resource\Cart</class>
+            <limit>0</limit>
+        </cart>
+        <user label="User" type="entity">
+            <class>Ff\Module\User\Resource\User</class>
+            <limit>0</limit>
+        </user>
+        <account label="User Account" type="area">
+        </account>
+        <admin label="Administration Panel" type="area">
+        </admin>
+    </resource>
+
+    <command>
+        <create>
+            <class>Ff\Lib\Command\Create</class>
+            <is_secure>true</is_secure>
+        </create>
+        <view>
+            <class>Ff\Lib\Command\View</class>
+            <is_secure>false</is_secure>
+        </view>
+        <update>
+            <class>Ff\Lib\Command\Update</class>
+            <is_secure>true</is_secure>
+        </update>
+        <delete>
+            <class>Ff\Lib\Command\Delete</class>
+            <is_secure>true</is_secure>
+        </delete>
+        <set>
+            <class>Ff\Lib\Command\Set</class>
+            <is_secure>true</is_secure>
+        </set>
+    </command>
+
+    <uri label="Uniform Resource Identifiers">
+        <default label="Default URI Set">
+            <resources>
+                <catalog>
+                    <category label="Catalog Category Information Page" resource="category">
+                        <scheme>catalog/category/default</scheme>
+                    </category>
+                    <product label="Catalog Product Information Page" resource="product">
+                        <scheme>catalog/product/default</scheme>
+                    </product>
+                </catalog>
+                <page label="Static Pages" resource="page">
+                    <scheme>static/product/page</scheme>
+                </page>
+                <admin label="Administration Panel" resource="admin">
+                    <scheme>admin/product/page</scheme>
+                </admin>
+            </resources>
+        </default>
+    </uri>
+
+    <render>
+        <html>
+            <page>
+                <class>Ff\Lib\Render\Html\Page</class>
+            </page>
+        </html>
+    </render>
+
+    <service>
+        <datastorage label="Default Database">
+            <class>Ff\Lib\Storage\Mysql</class>
+            <connection>
+                <username>root</username>
+                <password />
+                <dsn>mysql:host=localhost;dbname=fairframework</dsn>
+                <driver_options>
+                    <option_set_names>
+                        <code>1002</code>
+                        <value>SET NAMES 'UTF8'</value>
+                    </option_set_names>
+                    <option>
+                        <code>12</code>
+                        <value>true</value>
+                    </option>
+                </driver_options>
+            </connection>
+            <reader label="MySQL Database Reader Class" class="Ff\Lib\Storage\Database\Mysql\Read" />
+            <writer label="MySQL Database Writer Class" class="Ff\Lib\Storage\Database\Mysql\Write" />
+        </datastorage>
+    </service>
+</configuration>
