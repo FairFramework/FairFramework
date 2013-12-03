@@ -1,30 +1,8 @@
 <?php
 
-require_once './code/Ff/Autoload.php';
-
-spl_autoload_register('Ff\\Autoload::load');
-
-$root = __DIR__;
-
-define('ROOT_DIR', $root);
-
-Ff\Autoload::addIncludePath(array(
-    $root . '/code',
-    $root . '/runtime',
-    $root . '/interface',
-    $root
-));
-
-stream_register_wrapper('ff.template', 'Ff\Lib\Render\Template\Stream');
+require_once 'bootstrap.php';
 
 $startTime = microtime(true);
-
-$configuration = new Ff\Lib\Configuration();
-$configuration->load();
-
-$bus = new Ff\Lib\Bus($configuration);
-
-$application = new Ff\Lib\Application($bus);
 
 $context = new Ff\Lib\Context(
     $_GET,
@@ -34,7 +12,14 @@ $context = new Ff\Lib\Context(
     $_SERVER
 );
 
-$application->start($context);
+$configuration = new Ff\Lib\Configuration();
+$configuration->load();
+
+$bus = new Ff\Lib\Bus($configuration, $context);
+
+$application = new Ff\Lib\Application($bus);
+
+$application->start();
 
 $executionTime = microtime(true) - $startTime;
 echo '

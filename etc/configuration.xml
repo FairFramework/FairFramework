@@ -4,7 +4,30 @@
     <configuration>
         <class>Ff\Lib\Configuration</class>
     </configuration>
-    
+
+    <command>
+        <create>
+            <class>Ff\Lib\Command\Create</class>
+            <is_secure>true</is_secure>
+        </create>
+        <view>
+            <class>Ff\Lib\Command\View</class>
+            <is_secure>false</is_secure>
+        </view>
+        <update>
+            <class>Ff\Lib\Command\Update</class>
+            <is_secure>true</is_secure>
+        </update>
+        <delete>
+            <class>Ff\Lib\Command\Delete</class>
+            <is_secure>true</is_secure>
+        </delete>
+        <set>
+            <class>Ff\Lib\Command\Set</class>
+            <is_secure>true</is_secure>
+        </set>
+    </command>
+
     <resource label="Global Resources">
         <category label="Catalog Category" type="entity">
             <class>Ff\Module\Catalog\Resource\Category</class>
@@ -32,58 +55,6 @@
         </admin>
     </resource>
 
-    <command>
-        <create>
-            <class>Ff\Lib\Command\Create</class>
-            <is_secure>true</is_secure>
-        </create>
-        <view>
-            <class>Ff\Lib\Command\View</class>
-            <is_secure>false</is_secure>
-        </view>
-        <update>
-            <class>Ff\Lib\Command\Update</class>
-            <is_secure>true</is_secure>
-        </update>
-        <delete>
-            <class>Ff\Lib\Command\Delete</class>
-            <is_secure>true</is_secure>
-        </delete>
-        <set>
-            <class>Ff\Lib\Command\Set</class>
-            <is_secure>true</is_secure>
-        </set>
-    </command>
-
-    <uri label="Uniform Resource Identifiers">
-        <default label="Default URI Set">
-            <resources>
-                <catalog>
-                    <category label="Catalog Category Information Page" resource="category">
-                        <scheme>catalog/category/default</scheme>
-                    </category>
-                    <product label="Catalog Product Information Page" resource="product">
-                        <scheme>catalog/product/default</scheme>
-                    </product>
-                </catalog>
-                <page label="Static Pages" resource="page">
-                    <scheme>static/product/page</scheme>
-                </page>
-                <admin label="Administration Panel" resource="admin">
-                    <scheme>admin/product/page</scheme>
-                </admin>
-            </resources>
-        </default>
-    </uri>
-
-    <render>
-        <html>
-            <page>
-                <class>Ff\Lib\Render\Html\Page</class>
-            </page>
-        </html>
-    </render>
-
     <service>
         <datastorage label="Default Database">
             <class>Ff\Lib\Storage\Mysql</class>
@@ -106,4 +77,40 @@
             <writer label="MySQL Database Writer Class" class="Ff\Lib\Storage\Database\Mysql\Write" />
         </datastorage>
     </service>
+
+    <render>
+        <html>
+            <class>Ff\Lib\Render\Html</class>
+        </html>
+    </render>
+
+    <ui>
+        <title>
+            <class>Ff\Lib\Ui\Title</class>
+        </title>
+        <text>
+            <class>Ff\Lib\Ui\Text</class>
+        </text>
+    </ui>
+
+    <uri label="Uniform Resource Identifiers">
+        <default label="Default URI Set">
+            <resources>
+                <catalog>
+                    <category label="Catalog Category Information Page" resource="category">
+                        <scheme>catalog/category/default</scheme>
+                    </category>
+                    <product label="Catalog Product Information Page" resource="product">
+                        <scheme>catalog/product/default</scheme>
+                    </product>
+                </catalog>
+                <page label="Static Pages" resource="page">
+                    <scheme>static/product/page</scheme>
+                </page>
+                <admin label="Administration Panel" resource="admin">
+                    <scheme>admin/product/page</scheme>
+                </admin>
+            </resources>
+        </default>
+    </uri>
 </configuration>

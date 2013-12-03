@@ -3,9 +3,13 @@
 namespace Ff\Lib;
 
 use Ff\Lib\Configuration;
+use Ff\Lib\Context;
+
 use Ff\Runtime\Command;
 use Ff\Runtime\Resource;
 use Ff\Runtime\Service;
+use Ff\Runtime\Render;
+use Ff\Runtime\Ui;
 
 class Bus
 {
@@ -14,6 +18,11 @@ class Bus
      * @var Configuration
      */
     private $configurationInterface;
+
+    /**
+     * @var Context
+     */
+    private $context;
 
     /**
      *
@@ -26,27 +35,45 @@ class Bus
      * @var Resource
      */
     private $resourceInterface;
-    
+
     /**
      *
      * @var Service
      */
     private $serviceInterface;
-    
+
+    /**
+     *
+     * @var Render
+     */
+    private $renderInterface;
+
+    /**
+     *
+     * @var Ui
+     */
+    private $uiInterface;
+
     /**
      *
      * @var array
      */
     private $instances = array();
     
-    public function __construct(Configuration $configuration)
+    public function __construct(Configuration $configuration, Context $context)
     {
         $this->configurationInterface = $configuration;
+        $this->context = $context;
     }
     
     public function configuration()
     {
         return $this->configurationInterface;
+    }
+
+    public function context()
+    {
+        return $this->context;
     }
     
     public function command()
@@ -71,6 +98,22 @@ class Bus
             $this->serviceInterface = new Service($this);
         }
         return $this->serviceInterface;
+    }
+
+    public function render()
+    {
+        if (!isset($this->renderInterface)) {
+            $this->renderInterface = new Render($this);
+        }
+        return $this->renderInterface;
+    }
+
+    public function ui()
+    {
+        if (!isset($this->uiInterface)) {
+            $this->uiInterface = new Ui($this);
+        }
+        return $this->uiInterface;
     }
     
     public function getInstance($identifier)

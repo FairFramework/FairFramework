@@ -34,46 +34,48 @@ class Application
         $this->bus = $bus;
     }
 
-    public function start(Context $context)
+    public function start()
     {
+        $context = $this->bus->context();
+
         $command = $context->getParam('command', self::COMMAND_VIEW);
 
         $result = null;
         switch ($command) {
             case self::COMMAND_CREATE:
-                $uri = $this->bus->command()->create()->execute($context);
-                $this->redirect($context, $result);
+                $uri = $this->bus->command()->create()->execute();
+                $this->redirect($uri);
                 break;
             case self::COMMAND_DELETE:
-                $uri = $this->bus->command()->delete()->execute($context);
-                $this->redirect($context, $result);
+                $uri = $this->bus->command()->delete()->execute();
+                $this->redirect($uri);
                 break;
             case self::COMMAND_UPDATE:
-                $uri = $this->bus->command()->update()->execute($context);
-                $this->redirect($context, $result);
+                $uri = $this->bus->command()->update()->execute();
+                $this->redirect($uri);
                 break;
             case self::COMMAND_SET:
-                $uri = $this->bus->command()->set()->execute($context);
-                $this->redirect($context, $result);
+                $uri = $this->bus->command()->set()->execute();
+                $this->redirect($uri);
                 break;
             case self::COMMAND_VIEW:
                 $resource = $this->bus->command()->view()->execute($context);
-                $this->render($context, $resource);
+                $this->render($resource);
                 break;
         }
     }
 
-    public function redirect(Context $context, $uri)
+    public function redirect($uri)
     {
         //
     }
 
-    public function render(Context $context, Resource $resource)
+    public function render(Resource $resource)
     {
-        $content = $context->getParam('content_type', 'html');
-        $ui = $context->getParam('ui_type', 'page');
-        $contentRender = $this->bus->getInstance("render/{$content}/{$ui}");
+        $context = $this->bus->context();
 
-        $contentRender->render($resource);
+        $type = $context->getParam('render_type', 'html');
+
+        $this->bus->render()->$type()->render($resource);
     }
 }

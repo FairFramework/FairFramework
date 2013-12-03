@@ -1,6 +1,6 @@
 <?php
 
-namespace Ff\Lib\Render\Template;
+namespace Ff\Lib\Render\Html\Template;
 
 class Transport
 {

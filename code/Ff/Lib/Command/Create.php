@@ -2,7 +2,6 @@
 
 namespace Ff\Lib\Command;
 
-use Ff\Api\ContextInterface;
 use Ff\Lib\Bus;
 
 class Create
@@ -19,10 +18,9 @@ class Create
     }
     
     /**
-     * @param ContextInterface $context
      * @return string
      */
-    public function execute(ContextInterface $context)
+    public function execute()
     {
         //
         return '';

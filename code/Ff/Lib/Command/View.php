@@ -20,11 +20,12 @@ class View
     }
     
     /**
-     * @param ContextInterface $context
      * @return \Ff\Lib\Resource
      */
-    public function execute(ContextInterface $context)
+    public function execute()
     {
+        $context = $this->bus->context();
+
         $resourceName = $context->getParam('resource_name', 'page');
         $resourceIdentity = $context->getParam('resource_identity', 'home');
 
