@@ -119,19 +119,13 @@ class Bus
     public function getInstance($identifier)
     {
         if (!isset($this->instances[$identifier])) {
-            $className = $this->resolveClassName($identifier);
-            $this->instances[$identifier] = new $className($this);
+            $configuration = $this->configuration()->get($identifier);
+            if (!isset($configuration->class)) {
+                throw new \InvalidArgumentException("Wrong class name for the given resource: " . $identifier);
+            }
+            $this->instances[$identifier] = new $configuration->class($this, $configuration);
         }
         
         return $this->instances[$identifier];
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-    
-    private function resolveClassName($identifier)
-    {
-        $className = $this->configurationInterface->get("{$identifier}/class");
-        
-        return $className;
     }
 }

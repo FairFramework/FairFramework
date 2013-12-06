@@ -17,6 +17,12 @@ class Stream
 
     protected $stat;
 
+    public function __construct()
+    {
+        global $bus;
+        $this->bus = $bus;
+    }
+
     public function stream_open($path, $mode, $options, &$openedPath)
     {
         // get the view script source
@@ -26,7 +32,7 @@ class Stream
 
         $this->data = $this->loadTemplate($this->path);
 
-        $this->data = preg_replace_callback('#<data (.*?)>(.*?)</data>#', array($this, 'replace'), $this->data);
+        $this->data = preg_replace_callback('#<([a-z]*) (.*?)>(.*?)</([a-z]*)>#', array($this, 'replace'), $this->data);
 
         return true;
     }
@@ -63,14 +69,13 @@ class Stream
     
     private function replace($matches)
     {
-        $arguments = $this->parseArguments($matches[1]);
-        $value = $matches[2];
-
-        $data = Transport::get($this->path);
-        if ($data) {
+        $arguments = $this->parseArguments($matches[2]);
+        if (isset($arguments['ui-type'])) {
+            $value = $matches[3];
             $uiTypeRender = $this->getUiTypeRender($arguments);
             return $uiTypeRender->render($value, $arguments);
         }
+        return $matches[0];
     }
 
     private function parseArguments($rawArguments)
@@ -85,11 +90,10 @@ class Stream
 
     private function getUiTypeRender($arguments)
     {
-        $uiType = isset($arguments['ui-type']) ? $arguments['ui-type'] : 'Text';
+        $uiType = isset($arguments['ui-type']) ? $arguments['ui-type'] : 'text';
         if (!isset(self::$renders[$uiType])) {
-            $uiType = str_replace('_', '\\', $uiType);
-            $class = 'Ff\\Lib\\Ui\\' . $uiType;
-            self::$renders[$uiType] = new $class();
+            $uiType = str_replace('_', '/', $uiType);
+            self::$renders[$uiType] = $this->bus->getInstance('ui/' . $uiType);
         }
 
         return self::$renders[$uiType];

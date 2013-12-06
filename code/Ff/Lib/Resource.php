@@ -25,13 +25,16 @@ class Resource extends \stdClass
      * @var Data
      */
     public $data;
-    
-    public function __construct(Bus $bus)
+
+    /**
+     * @param Bus $bus
+     * @param Data $configuration
+     */
+    public function __construct(Bus $bus, Data $configuration)
     {
         $this->bus = $bus;
 
-        $config = $this->bus->configuration()->get('resource/' . $this->code);
-        $this->config = new Data($config);
+        $this->config = $configuration;
     }
 
     public function load($identity)
@@ -45,8 +48,30 @@ class Resource extends \stdClass
         ));
 
         $data = $storage->execute($query, 'fetch_row');
-        
+        if ($data === null) {
+            $data = array();
+        } else {
+            $this->loadConfiguration($identity);
+        }
         $this->data = new Data($data);
+    }
+
+    private function loadConfiguration($identity)
+    {
+        $storage = $this->bus->service()->datastorage();
+        $query = $storage->getQuery();
+        $query->table($this->code . '_configuration');
+        $query->fields('*');
+        $query->where(array(
+            $this->getIdentityName() => $identity
+        ));
+
+        $data = $storage->execute($query, 'fetch_all');
+        if ($data === null) {
+            $data = array();
+        }
+        $configuration = new Data($data);
+        $this->config->extend($configuration);
     }
 
     public function getData($key = null)
@@ -54,7 +79,7 @@ class Resource extends \stdClass
         if (null === $key) {
             return $this->data;
         }
-        return $this->data->getData($key);
+        return $this->data->get($key);
     }
 
     public function getConfig($key = null)
@@ -62,7 +87,7 @@ class Resource extends \stdClass
         if (null === $key) {
             return $this->config;
         }
-        return $this->data->getData($key);
+        return $this->config->get($key);
     }
     
     public function getCode()

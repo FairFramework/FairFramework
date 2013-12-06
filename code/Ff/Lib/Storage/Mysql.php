@@ -4,6 +4,7 @@ namespace Ff\Lib\Storage;
 
 use Ff\Lib\Bus;
 
+use Ff\Lib\Data;
 use Ff\Lib\Storage\Mysql\Query;
 use Ff\Lib\Storage\Mysql\Query\Builder;
 
@@ -17,29 +18,26 @@ class Mysql
     
     protected $connection;
 
-    protected $config = array();
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public function __construct(Bus $bus)
+    public function __construct(Bus $bus, Data $configuration)
     {
         $this->bus = $bus;
-        
-        $this->config = $this->bus->configuration()->get('service/datastorage');
 
-        if (!empty($this->config['connection']['driver_options'])) {
-            $options = array();
-            foreach ($this->config['connection']['driver_options'] as $option) {
-                $options[$option['code']] = $option['value'];
+        $driverOptions = $configuration->get('connection/driver_options');
+
+        $options = array();
+        if (!empty($driverOptions)) {
+            foreach ($driverOptions as $option) {
+                $options[$option->code] = $option->value;
             }
-            $this->config['connection']['driver_options'] = $options;
         }
 
         $this->connection = new \PDO(
-            $this->config['connection']['dsn'],
-            $this->config['connection']['username'],
-            $this->config['connection']['password'],
-            $this->config['connection']['driver_options']
+            $configuration->get('connection/dsn'),
+            $configuration->get('connection/username'),
+            $configuration->get('connection/password'),
+            $options
         );
     }
 

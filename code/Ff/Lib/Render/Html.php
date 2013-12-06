@@ -14,10 +14,20 @@ class Html
      * @var Bus
      */
     private $bus;
-    
-    public function __construct(Bus $bus)
+
+    /**
+     * @var Data
+     */
+    public $config;
+
+    /**
+     * @param Bus $bus
+     * @param Data $configuration
+     */
+    public function __construct(Bus $bus, Data $configuration)
     {
         $this->bus = $bus;
+        $this->config = $configuration;
 
         stream_register_wrapper('ff.template.phtml', 'Ff\Lib\Render\Html\Template\Stream');
     }

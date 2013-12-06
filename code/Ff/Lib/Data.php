@@ -4,28 +4,37 @@ namespace Ff\Lib;
 
 class Data extends \stdClass
 {
-    private $locked = true;
-    
     public function __construct(array $data = array(), $locked = true)
     {
         foreach ($data as $key => $value) {
             $this->__set($key, $value);
         }
-        
-        $this->locked = $locked;
     }
     
     public function __clone()
     {
-        $this->locked = false;
+        //
     }
 
-    public function __set($key, $value)
+    public function __set($path, $value)
     {
-        if (is_array($value)) {
-            $this->$key = new Data($value);
+        if (strpos($path, '/') === false) {
+            if (is_array($value)) {
+                $this->$path = new Data($value);
+            } else {
+                $this->$path = $value;
+            }
         } else {
-            $this->$key = $value;
+            $pathArray = explode('/', $path);
+            $object = $this;
+            foreach ($pathArray as $key) {
+                if (isset($object->$key)) {
+                    $object = $object->$key;
+                } else {
+                    $object->$key = new Data();
+                    $object = $object->$key;
+                }
+            }
         }
     }
     
@@ -42,20 +51,19 @@ class Data extends \stdClass
         
         return $this->getByPath($key, $default);
     }
+
+    public function extend(Data $data)
+    {
+
+    }
     
-    protected function getByPath($path, $default)
+    private function getByPath($path, $default)
     {
         $pathArray = explode('/', $path);
 
         $element = $this;
         foreach ($pathArray as $key) {
-            if (is_array($element)) {
-                if (isset($element[$key])) {
-                    $element = $element[$key];
-                } else {
-                    return $default;
-                }
-            } else if ($element instanceof \stdClass ) {
+            if ($element instanceof \stdClass ) {
                 if (isset($element->$key)) {
                     $element = $element->$key;
                 } else {

@@ -11,13 +11,10 @@ class Ui
      * @var Bus
      */
     private $bus;
-
-    private $contentType;
     
     public function __construct(Bus $bus)
     {
         $this->bus = $bus;
-        $this->contentType = $this->bus->context()->getParam('content_type', 'html');
     }
 
     /**

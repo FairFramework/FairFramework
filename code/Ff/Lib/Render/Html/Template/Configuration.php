@@ -12,14 +12,14 @@ class Configuration implements ConfigurationInterface
     protected $config;
 
     protected $singleTagElements = array(
-        'link', 'hr', 'meta'
+        'link', 'hr', 'meta', 'br'
     );
 
     public function __construct()
     {
         //
     }
-    
+
     public function load($filePath = null)
     {
         if ($filePath === null) {
@@ -303,7 +303,7 @@ class Configuration implements ConfigurationInterface
         }
 
         if (in_array($elementName, $this->singleTagElements)) {
-            $out .= '/>' . $nl;
+            $out .= ' />' . $nl;
             return $out;
         }
 
