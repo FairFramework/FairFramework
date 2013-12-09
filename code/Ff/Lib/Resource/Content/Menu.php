@@ -1,6 +1,6 @@
 <?php
 
-namespace Ff\Lib\Resource;
+namespace Ff\Lib\Resource\Content;
 
 use Ff\Lib\Data;
 use Ff\Lib\Resource;
@@ -21,20 +21,16 @@ class Menu extends Resource
                 'title' => 'Top Menu',
                 'items' => array(
                     array(
-                        'title' => 'Item 1',
-                        'has_items' => true,
-                        'items' => array(
-                            array(
-                                'title' => 'Sub Item 1'
-                            ),
-                            array(
-                                'title' => 'Sub Item 2'
-                            )
-                        )
+                        'title' => 'Dashboard',
+                        'uri' => 'dashboard'
                     ),
                     array(
-                        'title' => 'Edit',
-                        'command' => 'edit'
+                        'title' => 'Configuration',
+                        'uri' => 'configuration'
+                    ),
+                    array(
+                        'title' => 'Content',
+                        'uri' => 'content'
                     )
                 )
             )

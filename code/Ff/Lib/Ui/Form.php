@@ -7,11 +7,11 @@ use Ff\Lib\Render\Html\Template\Stream;
 use Ff\Lib\Render\Html\Template\Transport;
 use Ff\Lib\Ui\AbstractElement;
 
-class Menu extends AbstractElement
+class Form extends AbstractElement
 {
     public function render(Data $data, Data $attributes, Data $globalData)
     {
-        $template = isset($attributes->uiTemplate) ? $attributes->uiTemplate : 'Ui/Menu';
+        $template = isset($attributes->uiTemplate) ? $attributes->uiTemplate : 'Ui/Form';
         $path = DIR_CODE . 'Ff/Design/' . $globalData->uiTheme . '/Template/' . $template . '.php';
         $stream = new Stream();
 
@@ -21,11 +21,19 @@ class Menu extends AbstractElement
             $resource = $this->bus->getInstance('resource/' . $resourceName);
             $resource->load($resourceId);
             $dataToRender = $resource->getData();
-        } else {
-            $dataToRender = $data;
+            Transport::set($path, $dataToRender);
+            return $stream->render($path);
+        } elseif ($attributes->dataCollection) {
+            $resourceName = $attributes->dataCollection;
+            $dataToRender = $data->get($resourceName);
+            $result = '';
+            foreach ($dataToRender as $dataItem) {
+                Transport::set($path, $dataItem);
+                $result .= $stream->render($path);
+            }
+            return $result;
         }
 
-        Transport::set($path, $dataToRender);
-        return $stream->render($path);
+        return '';
     }
 }

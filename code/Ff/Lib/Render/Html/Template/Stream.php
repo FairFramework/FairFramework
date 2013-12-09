@@ -10,6 +10,8 @@ class Stream
 {
     private static $renders = array();
 
+    private static $templates = array();
+
     protected $pos = 0;
 
     protected $path;
@@ -24,42 +26,50 @@ class Stream
         $this->bus = $bus;
     }
 
+    public function render($path)
+    {
+        $this->path = $path;
+        return $this->loadTemplate($path);
+    }
+
     public function stream_open($path, $mode, $options, &$openedPath)
     {
         // get the view script source
-        $this->path = str_replace('ff.template.phtml://', '', $path);
+        $this->path = str_replace('ff.template.html://', '', $path);
 
         $this->stat = stat($this->path);
 
         $this->data = $this->loadTemplate($this->path);
-
-        $this->data = preg_replace_callback('#<([a-z]*) (.*?)>(.*?)</([a-z]*)>#', array($this, 'replace'), $this->data);
 
         return true;
     }
 
     private function loadTemplate($originalPath)
     {
-        $path = str_replace(DIR_CODE, '', $originalPath);
+        if (!isset(self::$templates[$this->path])) {
+            $path = str_replace(DIR_CODE, '', $originalPath);
 
-        $pathArray = explode('/', $path);
-        array_shift($pathArray); // remove namespace
+            $pathArray = explode('/', $path);
+            array_shift($pathArray); // remove namespace
 
-        $searchPath = DIR_CODE . '*/' . implode('/', $pathArray);
+            $searchPath = DIR_CODE . '*/' . implode('/', $pathArray);
 
-        $templates = glob($searchPath);
+            $templates = glob($searchPath);
 
-        $filteredTemplates = array_diff($templates, array($originalPath));
+            $filteredTemplates = array_diff($templates, array($originalPath));
 
-        $original = new Configuration($this->bus);
-        $original->load($originalPath);
+            $original = new Configuration($this->bus);
+            $original->load($originalPath);
 
-        if ($filteredTemplates) {
-            foreach ($filteredTemplates as $template) {
-                $content = new Configuration($this->bus);
-                $content->load($template);
-                $original->extend($content);
+            if ($filteredTemplates) {
+                foreach ($filteredTemplates as $template) {
+                    $content = new Configuration($this->bus);
+                    $content->load($template);
+                    $original->extend($content);
+                }
             }
+
+            self::$templates[$this->path] = $original;
         }
 
         $globalData = Transport::get('globalData');
@@ -68,7 +78,7 @@ class Stream
             $data = $globalData;
         }
 
-        $resultTemplate = '<!DOCTYPE html>' . "\n" . $original->toHtml(null, 0, $data, $globalData);
+        $resultTemplate = self::$templates[$this->path]->toHtml(null, 0, $data, $globalData);
 
         return $resultTemplate;
     }

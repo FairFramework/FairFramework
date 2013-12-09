@@ -9,18 +9,19 @@
         <a class="navbar-brand" href="#">@(title)</a>
     </div>
     <div class=" collapse navbar-collapse">
-        <ul class="nav navbar-nav" data-collection="items">
-            <li nif="@(has_items)">
-                <a nif="@(command)" href="#">@(title)</a>
-                <button if="@(command)" type="submit" class="btn btn-default">@(title)</button>
+        <ul class="nav navbar-nav" dataCollection="items">
+            <li nif="@(items)">
+                <a href="$(system/base_url)/@(uri)">@(title)</a>
             </li>
-            <li if="@(has_items)">
+            <li if="@(items)">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     <span>@(title)</span>
                     <b class="caret"></b>
                 </a>
-                <ul class="dropdown-menu" role="menu" data-collection="items">
-                    <li>@(title)</li>
+                <ul class="dropdown-menu" role="menu" dataCollection="items">
+                    <li>
+                        <a href="$(system/base_url)/@(uri)">@(title)</a>
+                    </li>
                 </ul>
             </li>
         </ul>

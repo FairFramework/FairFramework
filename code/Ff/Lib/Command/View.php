@@ -18,7 +18,7 @@ class View
     {
         $this->bus = $bus;
     }
-    
+
     /**
      * @return \Ff\Lib\Resource
      */

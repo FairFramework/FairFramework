@@ -29,7 +29,7 @@ class Html
         $this->bus = $bus;
         $this->config = $configuration;
 
-        stream_register_wrapper('ff.template.phtml', 'Ff\Lib\Render\Html\Template\Stream');
+        stream_register_wrapper('ff.template.html', 'Ff\Lib\Render\Html\Template\Stream');
     }
 
     public function render(Resource $resource)
@@ -39,10 +39,6 @@ class Html
 
         $path = DIR_CODE . 'Ff/Design/' . $uiTheme . '/Template/' . $uiTemplate .'.php';
 
-        $render = function ($data) use ($path) {
-            include 'ff.template.phtml://' . $path;
-        };
-        
         $data = new Data();
 
         $code = $resource->getCode();
@@ -54,14 +50,18 @@ class Html
 
         Transport::set('globalData', $data);
 
-        $render($data);
+        echo '<!DOCTYPE html>' . "\n";
+
+        include 'ff.template.html://' . $path;
     }
 
     private function getSystemData()
     {
         $data = array(
             'charset' => 'utf-8',
-            'lang' => 'en'
+            'lang' => 'en',
+            'base_url' => FF_BASE_URL,
+            'base_uri' => FF_BASE_URI
         );
         return new Data($data);
     }

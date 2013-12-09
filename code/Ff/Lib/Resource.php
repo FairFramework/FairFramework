@@ -13,7 +13,7 @@ class Resource extends \stdClass
      *
      * @var Bus
      */
-    private $bus;
+    protected $bus;
     
     /**
      * @var Data

@@ -120,18 +120,22 @@ class Context implements ContextInterface
                 $this->params = $params;
             }
 
-            $uri = ltrim($this->uri, '/');
-            if (empty($uri)) {
+            $this->uri = ltrim($this->uri, '/');
+
+            if (empty($this->uri)) {
                 $resourceName = 'page';
                 $resourceIdentity = 'home';
             } else {
-                $uriArray = explode('/', $uri);
+                $uriArray = explode('/', $this->uri);
                 $resourceName = array_shift($uriArray);
                 $resourceIdentity = array_shift($uriArray);
             }
 
             $this->params['resource_name'] = $resourceName;
             $this->params['resource_identity'] = $resourceIdentity;
+
+            define('FF_BASE_URI', $this->uri);
+            define('FF_BASE_URL', $this->getScheme() . '://' . $this->getHttpHost());
         }
     }
 }

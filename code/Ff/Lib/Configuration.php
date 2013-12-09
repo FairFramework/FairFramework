@@ -37,7 +37,7 @@ class Configuration implements ConfigurationInterface
 
     public function findElement($path)
     {
-        if ($path === null) {
+        if (!$path) {
             return $this->config;
         }
         $pathArr = explode('/', $path);
@@ -50,6 +50,41 @@ class Configuration implements ConfigurationInterface
             }
         }
         return $element;
+    }
+
+    public function toStructure(\SimpleXMLElement $element = null, $uri = '')
+    {
+        if ($element === null) {
+            $element = $this->config;
+            $uri = $element->getName();
+        } else {
+            $uri .= '/' . $element->getName();
+        }
+
+        $result = new Data();
+        $result->uri = $uri;
+        if ($element->attributes()) {
+            foreach ($element->attributes() as $attributeName => $attribute) {
+                $result->$attributeName = (string) $attribute;
+            }
+        }
+        $isCollection = isset($result->type) && ($result->type === 'collection');
+        if ($isCollection && $this->hasChildren($element)) {
+            $result->items = new Data();
+            foreach ($element->children() as $childName => $child) {
+                $result->items->$childName = $this->toStructure($child, $uri);
+            }
+        } elseif ($this->hasChildren($element))  {
+            foreach ($element->children() as $childName => $child) {
+                $result->$childName = $this->toStructure($child, $uri);
+            }
+        } elseif ($element->attributes()) {
+            $result->value = (string) $element;
+        } else {
+            $result = (string) $element;
+        }
+
+        return $result;
     }
 
     public function extend(Configuration $configuration, $overwrite = false)

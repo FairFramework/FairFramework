@@ -1,0 +1,13 @@
+/.buildpath
+/.cache
+/.htaccess
+/.metadata
+/.project
+/.settings
+atlassian*
+/index.php
+/nbproject
+/sitemap
+/.htaccess.orig
+/.idea
+/.gitattributes

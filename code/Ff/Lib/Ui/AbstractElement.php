@@ -29,11 +29,10 @@ abstract class AbstractElement
         $this->config = $configuration;
     }
 
-    abstract public function render(\SimpleXMLElement $element, Data $data, Data $globalData);
+    abstract public function render(Data $data, Data $attributes, Data $globalData);
 
-    protected function getAttributesHtml(\SimpleXMLElement $element)
+    protected function getAttributesHtml(array $attributes)
     {
-        $attributes = (array) $element->attributes();
         $html = array();
         foreach ($attributes as $name => $value) {
             $html[] = $name . '=' . '"' . $value . '"';

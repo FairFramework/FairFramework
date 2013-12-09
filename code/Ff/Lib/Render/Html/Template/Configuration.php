@@ -238,14 +238,17 @@ class Configuration implements ConfigurationInterface
         return $value;
     }
 
-    private function replaceWithData($search, $data, $default)
+    private function replaceWithData($search, $data, $attribute)
     {
         $search = (string) $search;
-        $try = $data->get($search);
-        if ($try) {
-            return $try;
+        $result = $data->get($search);
+        if ($result) {
+            if (in_array($attribute, array('if', 'nif'))) {
+                return true;
+            }
+            return $result;
         } else {
-            return (string) $default;
+            return null;
         }
     }
 
@@ -279,30 +282,35 @@ class Configuration implements ConfigurationInterface
         $out = $pad . '<' . $elementName;
 
         $attributes = $element->attributes();
+        $parsedAttributes = array();
         if ($attributes) {
             foreach ($attributes as $key => $value) {
                 $value = preg_replace_callback('#\$\((.*?)\)#',
-                    function ($matches) use ($globalData) {
-                        return $this->replaceWithData($matches[1], $globalData, '');
+                    function ($matches) use ($globalData, $key) {
+                        return $this->replaceWithData($matches[1], $globalData, $key);
                     }, $value);
 
                 $value = preg_replace_callback('#\@\((.*?)\)#',
-                    function ($matches) use ($data) {
-                        return $this->replaceWithData($matches[1], $data, '');
+                    function ($matches) use ($data, $key) {
+                        return $this->replaceWithData($matches[1], $data, $key);
                     }
                     , $value);
-                $out .= ' ' . $key . '="' . str_replace('"', '\"', $value) . '"';
 
                 if ($key === 'if') {
                     if (empty($value)) {
                         return '';
                     }
+                    continue;
                 }
                 if ($key === 'nif') {
                     if (!empty($value)) {
                         return '';
                     }
+                    continue;
                 }
+
+                $out .= ' ' . $key . '="' . str_replace('"', '\"', $value) . '"';
+                $parsedAttributes[$key] = $value;
             }
         }
 
@@ -321,13 +329,14 @@ class Configuration implements ConfigurationInterface
 
         $out .= '>';
 
-        if ($this->getAttribute($element, 'ui-type')) {
-            $uiTypeRender = $this->getUiTypeRender($this->getAttribute($element, 'ui-type'));
-            return $uiTypeRender->render($element, $data, $globalData);
+        if ($this->getAttribute($element, 'uiType')) {
+            $dataAttributes = new Data($parsedAttributes);
+            $uiTypeRender = $this->getUiTypeRender($this->getAttribute($element, 'uiType'));
+            return $uiTypeRender->render($data, $dataAttributes, $globalData);
         }
 
-        if ($this->getAttribute($element, 'data-collection')) {
-            $name = (string)$this->getAttribute($element, 'data-collection');
+        if ($this->getAttribute($element, 'dataCollection')) {
+            $name = (string)$this->getAttribute($element, 'dataCollection');
             $collection = $data->get($name);
         }
 

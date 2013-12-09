@@ -1,73 +1,65 @@
 <?xml version="1.0"?>
 
-<configuration>
-    <configuration>
-        <class>Ff\Lib\Configuration</class>
-    </configuration>
-
-    <command>
-        <create>
+<configuration label="Configuration Profile" type="collection">
+    <command label="Commands" type="collection">
+        <create label="Create">
             <class>Ff\Lib\Command\Create</class>
             <is_secure>true</is_secure>
         </create>
-        <edit>
+        <edit label="Edit">
             <class>Ff\Lib\Command\Edit</class>
             <is_secure>true</is_secure>
         </edit>
-        <view>
+        <view label="View">
             <class>Ff\Lib\Command\View</class>
             <is_secure>false</is_secure>
         </view>
-        <update>
+        <update label="Update">
             <class>Ff\Lib\Command\Update</class>
             <is_secure>true</is_secure>
         </update>
-        <delete>
+        <delete label="Delete">
             <class>Ff\Lib\Command\Delete</class>
             <is_secure>true</is_secure>
         </delete>
-        <set>
+        <set label="Set">
             <class>Ff\Lib\Command\Set</class>
             <is_secure>true</is_secure>
         </set>
     </command>
 
-    <resource label="Global Resources">
-        <category label="Catalog Category" type="entity">
-            <class>Ff\Module\Catalog\Resource\Category</class>
-            <limit>0</limit>
-        </category>
-        <product label="Catalog Product" type="entity">
-            <class>Ff\Module\Catalog\Resource\Product</class>
-            <limit>0</limit>
-        </product>
-        <page label="Static Page" type="entity">
-            <class>Ff\Module\Page\Resource\Page</class>
-            <ui_template>StaticPage</ui_template>
-        </page>
-        <cart label="Shopping Cart" type="entity">
-            <class>Ff\Module\Ecommerce\Resource\Cart</class>
-            <limit>0</limit>
-        </cart>
-        <user label="User" type="entity">
-            <class>Ff\Module\User\Resource\User</class>
-            <limit>0</limit>
-        </user>
-        <account label="User Account" type="area">
-        </account>
-        <admin label="Administration Panel" type="area">
-            <class>Ff\Module\Admin\Resource\AdminPanel</class>
-            <ui_template>AdminPage</ui_template>
-        </admin>
-        <system>
-            <class>Ff\Lib\Resource\System</class>
-        </system>
-        <menu>
-            <class>Ff\Lib\Resource\Menu</class>
-        </menu>
+    <resource label="Global Resources" type="collection">
+        <dashboard label="Dashboard">
+            <class>Ff\Lib\Resource\Dashboard</class>
+            <ui_template>DashboardPage</ui_template>
+        </dashboard>
+        <configuration label="Configuration">
+            <class>Ff\Lib\Resource\Configuration</class>
+            <ui_template>ConfigurationPage</ui_template>
+        </configuration>
+        <content label="Content">
+            <class>Ff\Lib\Resource\Content</class>
+            <ui_template>ContentPage</ui_template>
+
+            <menu label="Menu">
+                <class>Ff\Lib\Resource\Content\Menu</class>
+            </menu>
+            <user label="User">
+                <class>Ff\Module\User\Resource\User</class>
+                <limit>0</limit>
+            </user>
+            <page label="Static Pages">
+                <class>Ff\Module\Page\Resource\Page</class>
+                <ui_template>AdminPage</ui_template>
+            </page>
+            <cart label="Shopping Cart">
+                <class>Ff\Module\Ecommerce\Resource\Cart</class>
+                <limit>0</limit>
+            </cart>
+        </content>
     </resource>
 
-    <service>
+    <service label="Services" type="collection">
         <datastorage label="Default Database">
             <class>Ff\Lib\Storage\Mysql</class>
             <connection>
@@ -90,42 +82,27 @@
         </datastorage>
     </service>
 
-    <render>
-        <html>
+    <render label="Renders" type="collection">
+        <html label="HTML Render">
             <class>Ff\Lib\Render\Html</class>
         </html>
     </render>
 
-    <ui>
-        <title>
+    <ui label="UI Elements" type="collection">
+        <title label="Title">
             <class>Ff\Lib\Ui\Title</class>
         </title>
-        <text>
+        <text label="Text">
             <class>Ff\Lib\Ui\Text</class>
         </text>
-        <menu>
+        <menu label="Menu">
             <class>Ff\Lib\Ui\Menu</class>
         </menu>
+        <tree label="Tree">
+            <class>Ff\Lib\Ui\Tree</class>
+        </tree>
+        <form label="Form">
+            <class>Ff\Lib\Ui\Form</class>
+        </form>
     </ui>
-
-    <uri label="Uniform Resource Identifiers">
-        <default label="Default URI Set">
-            <resources>
-                <catalog>
-                    <category label="Catalog Category Information Page" resource="category">
-                        <scheme>catalog/category/default</scheme>
-                    </category>
-                    <product label="Catalog Product Information Page" resource="product">
-                        <scheme>catalog/product/default</scheme>
-                    </product>
-                </catalog>
-                <page label="Static Pages" resource="page">
-                    <scheme>static/product/page</scheme>
-                </page>
-                <admin label="Administration Panel" resource="admin">
-                    <scheme>admin/product/page</scheme>
-                </admin>
-            </resources>
-        </default>
-    </uri>
 </configuration>

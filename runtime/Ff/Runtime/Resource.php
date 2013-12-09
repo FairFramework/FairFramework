@@ -17,23 +17,18 @@ class Resource
         $this->bus = $bus;
     }
 
-    public function category()
+    public function dashboard()
     {
-        return $this->bus->getInstance('resource/category');
+        return $this->bus->getInstance('resource/dashboard');
     }
 
-    public function product()
+    public function configuration()
     {
-        return $this->bus->getInstance('resource/product');
+        return $this->bus->getInstance('resource/configuration');
     }
 
-    public function page()
+    public function content()
     {
-        return $this->bus->getInstance('resource/page');
-    }
-
-    public function admin()
-    {
-        return $this->bus->getInstance('resource/admin');
+        return $this->bus->getInstance('resource/content');
     }
 }
