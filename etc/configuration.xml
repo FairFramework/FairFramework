@@ -59,6 +59,12 @@
             <class>Ff\Module\Admin\Resource\AdminPanel</class>
             <ui_template>AdminPage</ui_template>
         </admin>
+        <system>
+            <class>Ff\Lib\Resource\System</class>
+        </system>
+        <menu>
+            <class>Ff\Lib\Resource\Menu</class>
+        </menu>
     </resource>
 
     <service>
@@ -97,6 +103,9 @@
         <text>
             <class>Ff\Lib\Ui\Text</class>
         </text>
+        <menu>
+            <class>Ff\Lib\Ui\Menu</class>
+        </menu>
     </ui>
 
     <uri label="Uniform Resource Identifiers">

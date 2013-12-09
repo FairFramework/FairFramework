@@ -11,7 +11,7 @@ abstract class AbstractElement
      *
      * @var Bus
      */
-    private $bus;
+    protected $bus;
 
     /**
      * @var Data
@@ -29,14 +29,21 @@ abstract class AbstractElement
         $this->config = $configuration;
     }
 
-    abstract public function render($content, array $arguments = array());
+    abstract public function render(\SimpleXMLElement $element, Data $data, Data $globalData);
 
-    protected function getArgumentsHtml(array $arguments)
+    protected function getAttributesHtml(\SimpleXMLElement $element)
     {
+        $attributes = (array) $element->attributes();
         $html = array();
-        foreach ($arguments as $name => $value) {
+        foreach ($attributes as $name => $value) {
             $html[] = $name . '=' . '"' . $value . '"';
         }
         return implode(' ', $html);
+    }
+
+    protected function getAttribute(\SimpleXMLElement $element, $name)
+    {
+        $attributes = $element->attributes();
+        return isset($attributes[$name]) ? (string)$attributes[$name] : null;
     }
 }

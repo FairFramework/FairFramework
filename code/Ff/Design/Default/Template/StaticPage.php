@@ -11,8 +11,8 @@
             <div id="page-content" class="content">
                 <div id="page-left" class="left"></div>
                 <div id="page-middle" class="jumbotron">
-                    <div ui-type="title" class="panel-title">$(page/data/name)</div>
-                    <div ui-type="text" class="panel">$(page/data/content)</div>
+                    <h1 class="panel-title">$(page/data/name)</h1>
+                    <p class="panel">$(page/data/content)</p>
                 </div>
                 <div id="page-right" class="right"></div>
             </div>

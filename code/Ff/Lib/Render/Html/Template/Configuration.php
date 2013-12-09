@@ -3,21 +3,33 @@
 namespace Ff\Lib\Render\Html\Template;
 
 use Ff\Api\ConfigurationInterface;
+use Ff\Lib\Bus;
+use Ff\Lib\Data;
 
 class Configuration implements ConfigurationInterface
 {
+    /**
+     * @var \Ff\Lib\Ui\AbstractElement[]
+     */
+    private static $renders = array();
+
     /**
      * @var \SimpleXMLElement
      */
     protected $config;
 
+    /**
+     * @var \Ff\Lib\Bus
+     */
+    protected $bus;
+
     protected $singleTagElements = array(
         'link', 'hr', 'meta', 'br'
     );
 
-    public function __construct()
+    public function __construct(Bus $bus)
     {
-        //
+        $this->bus = $bus;
     }
 
     public function load($filePath = null)
@@ -240,11 +252,11 @@ class Configuration implements ConfigurationInterface
     /**
      * @param \SimpleXMLElement $element
      * @param int $level
-     * @param \stdClass $data
-     * @param \stdClass $globalData
+     * @param Data $data
+     * @param Data $globalData
      * @return string
      */
-    public function toHtml(\SimpleXMLElement $element = null, $level = 0, \stdClass $data, \stdClass $globalData)
+    public function toHtml(\SimpleXMLElement $element = null, $level = 0, Data $data, Data $globalData)
     {
         if ($element === null) {
             $element = $this->config;
@@ -309,10 +321,16 @@ class Configuration implements ConfigurationInterface
 
         $out .= '>';
 
+        if ($this->getAttribute($element, 'ui-type')) {
+            $uiTypeRender = $this->getUiTypeRender($this->getAttribute($element, 'ui-type'));
+            return $uiTypeRender->render($element, $data, $globalData);
+        }
+
         if ($this->getAttribute($element, 'data-collection')) {
             $name = (string)$this->getAttribute($element, 'data-collection');
             $collection = $data->get($name);
         }
+
         if (!isset($collection)) {
             $collection = array($data);
         }
@@ -345,5 +363,15 @@ class Configuration implements ConfigurationInterface
         $out .= '</' . $elementName . '>' . $nl;
 
         return $out;
+    }
+
+    private function getUiTypeRender($uiType)
+    {
+        if (!isset(self::$renders[$uiType])) {
+            $uiType = str_replace('_', '/', $uiType);
+            self::$renders[$uiType] = $this->bus->getInstance('ui/' . $uiType);
+        }
+
+        return self::$renders[$uiType];
     }
 }

@@ -50,9 +50,9 @@ class Html
 
         $data->system = $this->getSystemData();
 
-        $data->topmenu = $this->getTopMenuData();
+        $data->uiTheme = $uiTheme;
 
-        Transport::set($path, $data);
+        Transport::set('globalData', $data);
 
         $render($data);
     }
@@ -64,28 +64,5 @@ class Html
             'lang' => 'en'
         );
         return new Data($data);
-    }
-
-    private function getTopMenuData()
-    {
-        $items = array(
-            array(
-                'title' => 'Item 1',
-                'has_items' => true,
-                'items' => array(
-                    array(
-                        'title' => 'Sub Item 1'
-                    ),
-                    array(
-                        'title' => 'Sub Item 2'
-                    )
-                )
-            ),
-            array(
-                'title' => 'Edit',
-                'command' => 'edit'
-            )
-        );
-        return new Data($items);
     }
 }

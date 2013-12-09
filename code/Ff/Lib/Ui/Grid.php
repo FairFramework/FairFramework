@@ -2,14 +2,15 @@
 
 namespace Ff\Lib\Ui;
 
+use Ff\Lib\Data;
 use Ff\Lib\Ui\AbstractElement;
 
 class Grid extends AbstractElement
 {
-    public function render($content, array $arguments = array())
+    public function render(\SimpleXMLElement $element, Data $data, Data $globalData)
     {
-        $result = '<table>';
-        foreach ($content as $rowId => $item) {
+        $result = '<table ' . $this->getAttributesHtml($element) . '>';
+        foreach ($data as $rowId => $item) {
             $result .= '<tr item-id="' . $rowId . '">';
             foreach ($item->fields as $fieldName => $value) {
                 $result .= '<td item-name="' . $fieldName . '">' . $value->value . '</td>';

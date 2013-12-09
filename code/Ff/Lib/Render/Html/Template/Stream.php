@@ -2,6 +2,7 @@
 
 namespace Ff\Lib\Render\Html\Template;
 
+use Ff\Lib\Data;
 use Ff\Lib\Render\Html\Template\Configuration;
 use Ff\Lib\Render\Html\Template\Transport;
 
@@ -50,19 +51,24 @@ class Stream
 
         $filteredTemplates = array_diff($templates, array($originalPath));
 
-        $original = new Configuration();
+        $original = new Configuration($this->bus);
         $original->load($originalPath);
 
         if ($filteredTemplates) {
             foreach ($filteredTemplates as $template) {
-                $content = new Configuration();
+                $content = new Configuration($this->bus);
                 $content->load($template);
                 $original->extend($content);
             }
         }
 
+        $globalData = Transport::get('globalData');
         $data = Transport::get($this->path);
-        $resultTemplate = '<!DOCTYPE html>' . "\n" . $original->toHtml(null, 0, $data, $data);
+        if ($data === null) {
+            $data = $globalData;
+        }
+
+        $resultTemplate = '<!DOCTYPE html>' . "\n" . $original->toHtml(null, 0, $data, $globalData);
 
         return $resultTemplate;
     }
