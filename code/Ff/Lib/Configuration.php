@@ -57,31 +57,37 @@ class Configuration implements ConfigurationInterface
         if ($element === null) {
             $element = $this->config;
             $uri = $element->getName();
-        } else {
-            $uri .= '/' . $element->getName();
         }
 
         $result = new Data();
         $result->uri = $uri;
+        $result->id = str_replace('/', '-', $uri);
+        $result->name = $element->getName();
         if ($element->attributes()) {
             foreach ($element->attributes() as $attributeName => $attribute) {
                 $result->$attributeName = (string) $attribute;
             }
         }
-        $isCollection = isset($result->type) && ($result->type === 'collection');
-        if ($isCollection && $this->hasChildren($element)) {
+
+        if (!$result->label) {
+            $result->label = ucwords(str_replace('_', ' ', $result->name));
+        }
+
+        if ($this->hasChildren($element)) {
+            $result->attributes = new Data();
             $result->items = new Data();
             foreach ($element->children() as $childName => $child) {
-                $result->items->$childName = $this->toStructure($child, $uri);
-            }
-        } elseif ($this->hasChildren($element))  {
-            foreach ($element->children() as $childName => $child) {
-                $result->$childName = $this->toStructure($child, $uri);
+                $_uri = $uri . '/' . $child->getName();
+                if ($childName === 'attributes') {
+                    $result->attributes = $this->toStructure($child, $_uri);
+                } else {
+                    $result->items->$childName = $this->toStructure($child, $_uri);
+                }
             }
         } elseif ($element->attributes()) {
             $result->value = (string) $element;
         } else {
-            $result = (string) $element;
+            $result->value = (string) $element;
         }
 
         return $result;
@@ -95,6 +101,22 @@ class Configuration implements ConfigurationInterface
         }
 
         return $this;
+    }
+
+    public function getResourceConfiguration($resourceIdentity)
+    {
+        $resourceIdentityArray = explode('/', $resourceIdentity);
+
+        while ($resourceIdentityArray) {
+            $resourceId = implode('/', $resourceIdentityArray);
+            $configuration = $this->get($resourceId);
+            if ($configuration) {
+                return $configuration;
+            }
+            array_pop($resourceIdentityArray);
+        }
+
+        throw new \InvalidArgumentException("Wrong resource identity: " . $resourceIdentity);
     }
 
     private function extendElement(\SimpleXMLElement $target, \SimpleXMLElement $element, $overwrite = false)

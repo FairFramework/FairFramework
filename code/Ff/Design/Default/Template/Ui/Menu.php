@@ -11,16 +11,16 @@
     <div class=" collapse navbar-collapse">
         <ul class="nav navbar-nav" dataCollection="items">
             <li nif="@(items)">
-                <a href="$(system/base_url)/@(uri)">@(title)</a>
+                <a href="$(system/base_url)@(uri)">@(label)</a>
             </li>
             <li if="@(items)">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                    <span>@(title)</span>
+                    <span>@(label)</span>
                     <b class="caret"></b>
                 </a>
                 <ul class="dropdown-menu" role="menu" dataCollection="items">
                     <li>
-                        <a href="$(system/base_url)/@(uri)">@(title)</a>
+                        <a href="$(system/base_url)@(uri)">@(label)</a>
                     </li>
                 </ul>
             </li>

@@ -9,28 +9,53 @@ class Menu extends Resource
 {
     protected $code = 'menu';
 
-    public function load($identity)
+    protected function load()
     {
-        $this->data = $this->getMenuData($identity);
+        $this->data = $this->getMenuData($this->identity);
     }
 
     private function getMenuData($identity)
     {
         $menu = array(
-            'topmenu' => array(
-                'title' => 'Top Menu',
+            'resource/content/menu' => array(
+                'label' => 'Menus',
                 'items' => array(
                     array(
-                        'title' => 'Dashboard',
-                        'uri' => 'dashboard'
+                        'label' => 'Top Menu',
+                        'uri' => 'resource/content/menu/topmenu'
                     ),
                     array(
-                        'title' => 'Configuration',
-                        'uri' => 'configuration'
+                        'label' => 'Bottom Menu',
+                        'uri' => 'resource/content/menu/bottommenu'
                     ),
                     array(
-                        'title' => 'Content',
-                        'uri' => 'content'
+                        'label' => 'Promo Menu',
+                        'uri' => 'resource/content/menu/promomenu'
+                    )
+                )
+            ),
+            'resource/content/menu/topmenu' => array(
+                'label' => 'Top Menu',
+                'attributes' => array(
+                    'items' => array(
+                        'type' => array(
+                            'label' => 'Type',
+                            'value' => 'nav'
+                        )
+                    )
+                ),
+                'items' => array(
+                    array(
+                        'label' => 'Dashboard',
+                        'uri' => 'resource/dashboard'
+                    ),
+                    array(
+                        'label' => 'Configuration',
+                        'uri' => 'resource/configuration'
+                    ),
+                    array(
+                        'label' => 'Content',
+                        'uri' => 'resource/content'
                     )
                 )
             )

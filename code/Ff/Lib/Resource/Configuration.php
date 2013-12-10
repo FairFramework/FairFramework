@@ -9,14 +9,16 @@ class Configuration extends Resource
 {
     protected $code = 'configuration';
 
-    public function load($identity)
+    protected function load()
     {
-        if (strpos($identity, 'configuration') === 0) {
-            $identity = str_replace('configuration', '', $identity);
+        if (strpos($this->identity, 'resource/configuration') === 0) {
+            $identity = preg_replace('#resource/configuration#', '', $this->identity);
             $identity = ltrim($identity, '/');
+        } else {
+            $identity = $this->identity;
         }
 
         $element = $this->bus->configuration()->findElement($identity);
-        $this->data = $this->bus->configuration()->toStructure($element);
+        $this->data = $this->bus->configuration()->toStructure($element, $this->identity);
     }
 }

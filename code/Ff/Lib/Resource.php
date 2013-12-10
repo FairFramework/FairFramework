@@ -27,51 +27,25 @@ class Resource extends \stdClass
     public $data;
 
     /**
+     * @var null
+     */
+    protected $identity;
+
+    /**
      * @param Bus $bus
      * @param Data $configuration
+     * @param null $identity
      */
-    public function __construct(Bus $bus, Data $configuration)
+    public function __construct(Bus $bus, Data $configuration, $identity = null)
     {
         $this->bus = $bus;
 
         $this->config = $configuration;
-    }
 
-    public function load($identity)
-    {
-        $storage = $this->bus->service()->datastorage();
-        $query = $storage->getQuery();
-        $query->table($this->code);
-        $query->fields('*');
-        $query->where(array(
-            $this->getIdentityName() => $identity
-        ));
-
-        $data = $storage->execute($query, 'fetch_row');
-        if ($data === null) {
-            $data = array();
-        } else {
-            $this->loadConfiguration($identity);
+        $this->identity = $identity;
+        if ($this->identity) {
+            $this->load();
         }
-        $this->data = new Data($data);
-    }
-
-    private function loadConfiguration($identity)
-    {
-        $storage = $this->bus->service()->datastorage();
-        $query = $storage->getQuery();
-        $query->table($this->code . '_configuration');
-        $query->fields('*');
-        $query->where(array(
-            $this->getIdentityName() => $identity
-        ));
-
-        $data = $storage->execute($query, 'fetch_all');
-        if ($data === null) {
-            $data = array();
-        }
-        $configuration = new Data($data);
-        $this->config->extend($configuration);
     }
 
     public function getData($key = null)
@@ -93,6 +67,43 @@ class Resource extends \stdClass
     public function getCode()
     {
         return $this->code;
+    }
+
+    protected function load()
+    {
+        $storage = $this->bus->service()->datastorage();
+        $query = $storage->getQuery();
+        $query->table($this->code);
+        $query->fields('*');
+        $query->where(array(
+            $this->getIdentityName() => $this->identity
+        ));
+
+        $data = $storage->execute($query, 'fetch_row');
+        if ($data === null) {
+            $data = array();
+        } else {
+            $this->loadConfiguration();
+        }
+        $this->data = new Data($data);
+    }
+
+    protected function loadConfiguration()
+    {
+        $storage = $this->bus->service()->datastorage();
+        $query = $storage->getQuery();
+        $query->table($this->code . '_configuration');
+        $query->fields('*');
+        $query->where(array(
+            $this->getIdentityName() => $this->identity
+        ));
+
+        $data = $storage->execute($query, 'fetch_all');
+        if ($data === null) {
+            $data = array();
+        }
+        $configuration = new Data($data);
+        $this->config->extend($configuration);
     }
 
     private function getIdentityName()

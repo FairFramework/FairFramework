@@ -4,6 +4,8 @@ namespace Ff\Lib\Ui;
 
 use Ff\Lib\Bus;
 use Ff\Lib\Data;
+use Ff\Lib\Render\Html\Template\Stream;
+use Ff\Lib\Render\Html\Template\Transport;
 
 abstract class AbstractElement
 {
@@ -29,7 +31,42 @@ abstract class AbstractElement
         $this->config = $configuration;
     }
 
-    abstract public function render(Data $data, Data $attributes, Data $globalData);
+    public function render(Data $data, Data $attributes, Data $globalData)
+    {
+        $template = isset($attributes->uiTemplate)
+            ? $attributes->uiTemplate
+            : $this->config->get('attributes/template');
+        $path = DIR_CODE . 'Ff/Design/' . $globalData->uiTheme . '/Template/' . $template . '.php';
+
+        return $this->renderTemplate($path, $data, $attributes);
+    }
+
+    protected function renderTemplate($path, Data $data, Data $attributes)
+    {
+        $stream = new Stream();
+
+        if ($attributes->resource) {
+            $resourceIdentity = $attributes->resource;
+            $resource = $this->bus->getInstance($resourceIdentity);
+            $dataToRender = $resource->getData();
+            Transport::set($path, $dataToRender);
+            return $stream->render($path);
+        } elseif ($attributes->dataCollection) {
+            $resourceName = $attributes->dataCollection;
+            $dataToRender = $data->get($resourceName);
+            $result = '';
+            foreach ($dataToRender as $dataItem) {
+                Transport::set($path, $dataItem);
+                $result .= $stream->render($path);
+            }
+            return $result;
+        } else {
+            Transport::set($path, $data);
+            return $stream->render($path);
+        }
+
+        return '';
+    }
 
     protected function getAttributesHtml(array $attributes)
     {

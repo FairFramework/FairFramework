@@ -8,14 +8,9 @@ class Content extends Resource
 {
     protected $code = 'content';
 
-    public function load($identity)
+    protected function load()
     {
-        if (strpos($identity, 'configuration') === 0) {
-            $identity = str_replace('configuration', '', $identity);
-            $identity = ltrim($identity, '/');
-        }
-
-        $element = $this->bus->configuration()->findElement($identity);
-        $this->data = $this->bus->configuration()->toStructure($element);
+        $element = $this->bus->configuration()->findElement($this->identity);
+        $this->data = $this->bus->configuration()->toStructure($element, $this->identity);
     }
 }

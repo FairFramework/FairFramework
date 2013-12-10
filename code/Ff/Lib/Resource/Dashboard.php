@@ -9,7 +9,7 @@ class Dashboard extends Resource
 {
     protected $code = 'dashboard';
 
-    public function load($identity)
+    protected function load()
     {
         $this->data = new Data();
     }

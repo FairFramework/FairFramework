@@ -8,14 +8,11 @@
     <form id="page-form" enctype="multipart/form-data" action="" method="POST" role="form">
         <div id="page-container" class="container">
             <div id="page-header">
-                <div uiType="menu" id="topmenu" resource="content/menu" dataIdentity="topmenu"></div>
+                <div uiType="menu" id="topmenu" resource="resource/content/menu/topmenu"></div>
             </div>
             <div id="page-content" class="content row">
-                <div id="page-left" class="col-md-4">
-
-                </div>
-                <div id="page-middle" class="jumbotron col-md-8">
-                    <div uiType="form" id="dashboard" resource="dashboard"></div>
+                <div id="page-middle" class="jumbotron col-md-12">
+                    <div uiType="content" id="content" resource="$(system/base_uri)"></div>
                 </div>
             </div>
             <div id="page-footer" class="panel-footer"></div>

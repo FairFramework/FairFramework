@@ -115,17 +115,19 @@ class Bus
         }
         return $this->uiInterface;
     }
-    
-    public function getInstance($identifier)
+
+    public function getInstance($resourceIdentity)
     {
-        if (!isset($this->instances[$identifier])) {
-            $configuration = $this->configuration()->get($identifier);
-            if (!isset($configuration->class)) {
-                throw new \InvalidArgumentException("Wrong class name for the given resource: " . $identifier);
+        if (!isset($this->instances[$resourceIdentity])) {
+            $configuration = $this->configuration()->getResourceConfiguration($resourceIdentity);
+            if (!$configuration || !$configuration->get('attributes/class')) {
+                throw new \InvalidArgumentException("Wrong class name for the given resource: " . $resourceIdentity);
             }
-            $this->instances[$identifier] = new $configuration->class($this, $configuration);
+            $class = $configuration->get('attributes/class');
+            $resource = new $class($this, $configuration, $resourceIdentity);
+            $this->instances[$resourceIdentity] = $resource;
         }
-        
-        return $this->instances[$identifier];
+
+        return $this->instances[$resourceIdentity];
     }
 }

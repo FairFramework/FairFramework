@@ -24,7 +24,7 @@ class Mysql
     {
         $this->bus = $bus;
 
-        $driverOptions = $configuration->get('connection/driver_options');
+        $driverOptions = $configuration->get('attributes/connection/driver_options');
 
         $options = array();
         if (!empty($driverOptions)) {
@@ -34,9 +34,9 @@ class Mysql
         }
 
         $this->connection = new \PDO(
-            $configuration->get('connection/dsn'),
-            $configuration->get('connection/username'),
-            $configuration->get('connection/password'),
+            $configuration->get('attributes/connection/dsn'),
+            $configuration->get('attributes/connection/username'),
+            $configuration->get('attributes/connection/password'),
             $options
         );
     }

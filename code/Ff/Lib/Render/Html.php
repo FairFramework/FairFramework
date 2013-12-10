@@ -35,7 +35,7 @@ class Html
     public function render(Resource $resource)
     {
         $uiTheme = $resource->config->get('ui_theme', 'Default');
-        $uiTemplate = $resource->config->get('ui_template', 'StaticPage');
+        $uiTemplate = $resource->config->get('attributes/ui_template', 'StaticPage');
 
         $path = DIR_CODE . 'Ff/Design/' . $uiTheme . '/Template/' . $uiTemplate .'.php';
 

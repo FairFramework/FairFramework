@@ -5,16 +5,15 @@
         <link rel="stylesheet" href="/bootstrap.css" />
     </head>
     <body>
-    <form id="page-form" enctype="multipart/form-data" action="" method="POST">
+    <form id="page-form" enctype="multipart/form-data" action="" method="POST" role="form">
         <div id="page-container" class="container">
-            <div id="page-header"></div>
-            <div id="page-content" class="content">
-                <div id="page-left" class="left"></div>
-                <div id="page-middle" class="jumbotron">
-                    <h1 class="panel-title">$(page/data/name)</h1>
-                    <p class="panel">$(page/data/content)</p>
+            <div id="page-header">
+                <div uiType="menu" id="topmenu" resource="resource/content/menu/topmenu"></div>
+            </div>
+            <div id="page-content" class="content row">
+                <div id="page-middle" class="jumbotron col-md-12">
+                    <div uiType="listing" id="listing" resource="$(system/base_uri)"></div>
                 </div>
-                <div id="page-right" class="right"></div>
             </div>
             <div id="page-footer" class="panel-footer"></div>
         </div>

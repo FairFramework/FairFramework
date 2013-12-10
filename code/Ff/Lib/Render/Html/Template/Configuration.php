@@ -252,6 +252,19 @@ class Configuration implements ConfigurationInterface
         }
     }
 
+    private function assertCondition($search, $compare, $data)
+    {
+        $search = (string) $search;
+        $result = $data->get($search);
+        if ($result === $compare) {
+            return 'CONTINUE';
+        } elseif (!$result && !$compare) {
+            return 'CONTINUE';
+        } else {
+            return 'SKIP';
+        }
+    }
+
     /**
      * @param \SimpleXMLElement $element
      * @param int $level
@@ -285,11 +298,26 @@ class Configuration implements ConfigurationInterface
         $parsedAttributes = array();
         if ($attributes) {
             foreach ($attributes as $key => $value) {
+                if ($key === 'assert') {
+                    $value = preg_replace_callback('#\$\((.*?)\)=\((.*?)\)#',
+                        function ($matches) use ($globalData, $key) {
+                            return $this->assertCondition($matches[1], $matches[2], $globalData);
+                        }, $value);
+                    $value = preg_replace_callback('#\@\((.*?)\)=\((.*?)\)#',
+                        function ($matches) use ($data, $key) {
+                            return $this->assertCondition($matches[1], $matches[2], $data);
+                        }
+                        , $value);
+                    if ($value === 'SKIP') {
+                        return '';
+                    }
+                    continue;
+                }
+
                 $value = preg_replace_callback('#\$\((.*?)\)#',
                     function ($matches) use ($globalData, $key) {
                         return $this->replaceWithData($matches[1], $globalData, $key);
                     }, $value);
-
                 $value = preg_replace_callback('#\@\((.*?)\)#',
                     function ($matches) use ($data, $key) {
                         return $this->replaceWithData($matches[1], $data, $key);
@@ -329,43 +357,43 @@ class Configuration implements ConfigurationInterface
 
         $out .= '>';
 
-        if ($this->getAttribute($element, 'uiType')) {
-            $dataAttributes = new Data($parsedAttributes);
-            $uiTypeRender = $this->getUiTypeRender($this->getAttribute($element, 'uiType'));
+        $dataAttributes = new Data($parsedAttributes);
+
+        if ($dataAttributes->uiType) {
+            $uiTypeRender = $this->getUiTypeRender($dataAttributes->uiType);
             return $uiTypeRender->render($data, $dataAttributes, $globalData);
         }
 
-        if ($this->getAttribute($element, 'dataCollection')) {
-            $name = (string)$this->getAttribute($element, 'dataCollection');
-            $collection = $data->get($name);
-        }
-
-        if (!isset($collection)) {
+        if ($dataAttributes->dataCollection) {
+            $collection = $data->get($dataAttributes->dataCollection);
+        } else {
             $collection = array($data);
         }
 
-        foreach ($collection as $item) {
-            if ($this->hasChildren($element)) {
-                $value = trim((string)$element);
+        if ($collection) {
+            foreach ($collection as $item) {
+                if ($this->hasChildren($element)) {
+                    $value = trim((string)$element);
+                    if (strlen($value)) {
+                        $out .= $this->xmlentities($value);
+                    }
+                    $out .= $nl;
+                    foreach ($element->children() as $child) {
+                        $out .= $this->toHtml($child, $level+1, $item, $globalData);
+                    }
+                    $out .= $pad;
+                }
+                $value = (string)$element;
                 if (strlen($value)) {
+                    $replace = function ($matches) use ($item) {
+                        return $this->replaceWithData($matches[1], $item, '');
+                    };
+
+                    $value = preg_replace_callback('#\@\((.*?)\)#', $replace, $value);
+                    $value = preg_replace_callback('#\$\((.*?)\)#', $replaceGlobal, $value);
+
                     $out .= $this->xmlentities($value);
                 }
-                $out .= $nl;
-                foreach ($element->children() as $child) {
-                    $out .= $this->toHtml($child, $level+1, $item, $globalData);
-                }
-                $out .= $pad;
-            }
-            $value = (string)$element;
-            if (strlen($value)) {
-                $replace = function ($matches) use ($item) {
-                    return $this->replaceWithData($matches[1], $item, '');
-                };
-
-                $value = preg_replace_callback('#\@\((.*?)\)#', $replace, $value);
-                $value = preg_replace_callback('#\$\((.*?)\)#', $replaceGlobal, $value);
-
-                $out .= $this->xmlentities($value);
             }
         }
 

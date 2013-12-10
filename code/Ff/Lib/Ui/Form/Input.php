@@ -1,11 +1,11 @@
 <?php
 
-namespace Ff\Lib\Ui;
+namespace Ff\Lib\Ui\Form;
 
 use Ff\Lib\Data;
 use Ff\Lib\Ui\AbstractElement;
 
-class Menu extends AbstractElement
+class Input extends AbstractElement
 {
     //
 }

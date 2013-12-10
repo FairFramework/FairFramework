@@ -26,11 +26,9 @@ class View
     {
         $context = $this->bus->context();
 
-        $resourceName = $context->getParam('resource_name');
         $resourceIdentity = $context->getParam('resource_identity');
 
-        $resource = $this->bus->resource()->$resourceName();
-        $resource->load($resourceIdentity);
+        $resource = $this->bus->getInstance($resourceIdentity);
 
         return $resource;
     }

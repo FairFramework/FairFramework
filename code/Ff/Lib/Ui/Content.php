@@ -5,7 +5,7 @@ namespace Ff\Lib\Ui;
 use Ff\Lib\Data;
 use Ff\Lib\Ui\AbstractElement;
 
-class Menu extends AbstractElement
+class Content extends AbstractElement
 {
     //
 }

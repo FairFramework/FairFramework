@@ -3,106 +3,170 @@
 <configuration label="Configuration Profile" type="collection">
     <command label="Commands" type="collection">
         <create label="Create">
-            <class>Ff\Lib\Command\Create</class>
-            <is_secure>true</is_secure>
+            <attributes label="Attributes">
+                <class>Ff\Lib\Command\Create</class>
+                <is_secure type="bool">1</is_secure>
+            </attributes>
         </create>
         <edit label="Edit">
-            <class>Ff\Lib\Command\Edit</class>
-            <is_secure>true</is_secure>
+            <attributes label="Attributes">
+                <class>Ff\Lib\Command\Edit</class>
+                <is_secure type="bool">1</is_secure>
+            </attributes>
         </edit>
         <view label="View">
-            <class>Ff\Lib\Command\View</class>
-            <is_secure>false</is_secure>
+            <attributes label="Attributes">
+                <class>Ff\Lib\Command\View</class>
+                <is_secure type="bool">false</is_secure>
+            </attributes>
         </view>
         <update label="Update">
-            <class>Ff\Lib\Command\Update</class>
-            <is_secure>true</is_secure>
+            <attributes label="Attributes">
+                <class>Ff\Lib\Command\Update</class>
+                <is_secure type="bool">1</is_secure>
+            </attributes>
         </update>
         <delete label="Delete">
-            <class>Ff\Lib\Command\Delete</class>
-            <is_secure>true</is_secure>
+            <attributes label="Attributes">
+                <class>Ff\Lib\Command\Delete</class>
+                <is_secure type="bool">1</is_secure>
+            </attributes>
         </delete>
         <set label="Set">
-            <class>Ff\Lib\Command\Set</class>
-            <is_secure>true</is_secure>
+            <attributes label="Attributes">
+                <class>Ff\Lib\Command\Set</class>
+                <is_secure type="bool">1</is_secure>
+            </attributes>
         </set>
     </command>
 
     <resource label="Global Resources" type="collection">
         <dashboard label="Dashboard">
-            <class>Ff\Lib\Resource\Dashboard</class>
-            <ui_template>DashboardPage</ui_template>
+            <attributes label="Attributes">
+                <class>Ff\Lib\Resource\Dashboard</class>
+                <ui_template>DashboardPage</ui_template>
+            </attributes>
         </dashboard>
         <configuration label="Configuration">
-            <class>Ff\Lib\Resource\Configuration</class>
-            <ui_template>ConfigurationPage</ui_template>
+            <attributes label="Attributes">
+                <class>Ff\Lib\Resource\Configuration</class>
+                <ui_template>ConfigurationPage</ui_template>
+            </attributes>
         </configuration>
-        <content label="Content">
-            <class>Ff\Lib\Resource\Content</class>
-            <ui_template>ContentPage</ui_template>
+        <content label="Content" type="collection">
+            <attributes label="Attributes">
+                <class>Ff\Lib\Resource\Content</class>
+                <ui_template>ListingPage</ui_template>
+            </attributes>
 
-            <menu label="Menu">
-                <class>Ff\Lib\Resource\Content\Menu</class>
+            <menu label="Menu" type="collection">
+                <attributes label="Attributes">
+                    <class>Ff\Lib\Resource\Content\Menu</class>
+                    <ui_template>ListingPage</ui_template>
+                </attributes>
+                <topmenu label="Top Menu">
+                    <attributes label="Attributes">
+                        <class>Ff\Lib\Resource\Content\Menu</class>
+                        <ui_template>ContentPage</ui_template>
+                    </attributes>
+                </topmenu>
             </menu>
             <user label="User">
-                <class>Ff\Module\User\Resource\User</class>
-                <limit>0</limit>
+                <attributes label="Attributes">
+                    <class>Ff\Module\User\Resource\User</class>
+                    <ui_template>ListingPage</ui_template>
+                </attributes>
             </user>
             <page label="Static Pages">
-                <class>Ff\Module\Page\Resource\Page</class>
-                <ui_template>AdminPage</ui_template>
+                <attributes label="Attributes">
+                    <class>Ff\Module\Page\Resource\Page</class>
+                    <ui_template>ListingPage</ui_template>
+                </attributes>
             </page>
             <cart label="Shopping Cart">
-                <class>Ff\Module\Ecommerce\Resource\Cart</class>
-                <limit>0</limit>
+                <attributes label="Attributes">
+                    <class>Ff\Module\Ecommerce\Resource\Cart</class>
+                    <ui_template>ListingPage</ui_template>
+                </attributes>
             </cart>
         </content>
     </resource>
 
     <service label="Services" type="collection">
         <datastorage label="Default Database">
-            <class>Ff\Lib\Storage\Mysql</class>
-            <connection>
-                <username>root</username>
-                <password />
-                <dsn>mysql:host=localhost;dbname=fairframework</dsn>
-                <driver_options>
-                    <option_set_names>
-                        <code>1002</code>
-                        <value>SET NAMES 'UTF8'</value>
-                    </option_set_names>
-                    <option>
-                        <code>12</code>
-                        <value>true</value>
-                    </option>
-                </driver_options>
-            </connection>
-            <reader label="MySQL Database Reader Class" class="Ff\Lib\Storage\Database\Mysql\Read" />
-            <writer label="MySQL Database Writer Class" class="Ff\Lib\Storage\Database\Mysql\Write" />
+            <attributes label="Attributes">
+                <class>Ff\Lib\Storage\Mysql</class>
+                <connection type="hash">
+                    <username>root</username>
+                    <password />
+                    <dsn>mysql:host=localhost;dbname=fairframework</dsn>
+                    <driver_options type="hash">
+                        <option_set_names type="hash">
+                            <code>1002</code>
+                            <value>SET NAMES 'UTF8'</value>
+                        </option_set_names>
+                        <option type="hash">
+                            <code>12</code>
+                            <value>true</value>
+                        </option>
+                    </driver_options>
+                </connection>
+                <reader label="MySQL Database Reader Class" class="Ff\Lib\Storage\Database\Mysql\Read" />
+                <writer label="MySQL Database Writer Class" class="Ff\Lib\Storage\Database\Mysql\Write" />
+            </attributes>
         </datastorage>
     </service>
 
     <render label="Renders" type="collection">
         <html label="HTML Render">
-            <class>Ff\Lib\Render\Html</class>
+            <attributes label="Attributes">
+                <class>Ff\Lib\Render\Html</class>
+            </attributes>
         </html>
     </render>
 
     <ui label="UI Elements" type="collection">
-        <title label="Title">
-            <class>Ff\Lib\Ui\Title</class>
-        </title>
-        <text label="Text">
-            <class>Ff\Lib\Ui\Text</class>
-        </text>
         <menu label="Menu">
-            <class>Ff\Lib\Ui\Menu</class>
+            <attributes label="Attributes">
+                <class>Ff\Lib\Ui\Menu</class>
+                <template>Ui\Menu</template>
+            </attributes>
         </menu>
         <tree label="Tree">
-            <class>Ff\Lib\Ui\Tree</class>
+            <attributes label="Attributes">
+                <class>Ff\Lib\Ui\Tree</class>
+                <template>Ui\Tree</template>
+            </attributes>
         </tree>
         <form label="Form">
-            <class>Ff\Lib\Ui\Form</class>
+            <attributes label="Attributes">
+                <class>Ff\Lib\Ui\Form</class>
+                <template>Ui\Form</template>
+            </attributes>
+            <input>
+                <attributes label="Attributes">
+                    <class>Ff\Lib\Ui\Form\Input</class>
+                    <template>Ui\Form\Input</template>
+                </attributes>
+            </input>
+            <hash>
+                <attributes label="Attributes">
+                    <class>Ff\Lib\Ui\Form\Hash</class>
+                    <template>Ui\Form\Hash</template>
+                </attributes>
+            </hash>
         </form>
+        <listing label="Listing">
+            <attributes label="Attributes">
+                <class>Ff\Lib\Ui\Listing</class>
+                <template>Ui\Listing</template>
+            </attributes>
+        </listing>
+        <content label="Content">
+            <attributes label="Attributes">
+                <class>Ff\Lib\Ui\Content</class>
+                <template>Ui\Content</template>
+            </attributes>
+        </content>
     </ui>
 </configuration>
