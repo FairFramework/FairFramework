@@ -73,7 +73,11 @@ class Stream
             self::$templates[$this->path] = $template;
         }
 
-        return self::$templates[$this->path]->render();
+        $root = self::$templates[$this->path]->prepare();
+
+        $processor = new Template\Processor($this->bus);
+
+        return $processor->render($root);
     }
 
     /**

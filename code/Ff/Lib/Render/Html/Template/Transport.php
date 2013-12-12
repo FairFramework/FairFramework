@@ -8,6 +8,8 @@ class Transport
 {
     static $data;
 
+    protected static $map = array();
+
     private static function getData()
     {
         if (!isset(self::$data)) {
@@ -19,12 +21,20 @@ class Transport
     public static function set($key, $value)
     {
         $data = self::getData();
-        $data->__set($key, $value);
+        $target = $data->__set($key, $value);
+
+        // caching
+        self::$map[$key] = $target;
     }
 
 
     public static function get($key, $default = null)
     {
+        if (isset(self::$map[$key])) {
+            // caching
+            return self::$map[$key];
+        }
+
         $data = self::getData();
 
         return $data->get($key, $default);

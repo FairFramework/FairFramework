@@ -19,6 +19,7 @@ class Data extends \stdClass
             } else {
                 $this->$path = $value;
             }
+            return $this->$path;
         } else {
             $pathArray = explode('/', $path);
             if ($pathArray) {
@@ -35,6 +36,7 @@ class Data extends \stdClass
                     // @TODO
                 }
                 $prev->$key = $value;
+                return $prev->$key;
             }
         }
     }
@@ -49,7 +51,7 @@ class Data extends \stdClass
         if (strpos($key, '/') === false) {
             return isset($this->$key) ? $this->$key : $default;
         }
-        
+
         return $this->getByPath($key, $default);
     }
 

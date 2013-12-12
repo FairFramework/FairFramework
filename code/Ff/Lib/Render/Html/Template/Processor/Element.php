@@ -55,9 +55,11 @@ class Element
         if ($this->getAttribute($sourceElement, 'local_reference_prefix')) {
             $value = $this->getAttribute($sourceElement, 'local_reference_prefix');
             $localRefPrefix = $this->attributeProcessor->prepareAttribute('local_reference_prefix', $value);
-            $resource = $this->bus->getInstance($localRefPrefix);
-            if ($resource) {
-                Transport::set($localRefPrefix, $resource->getData());
+            if (!Transport::get($localRefPrefix)) {
+                $resource = $this->bus->getInstance($localRefPrefix);
+                if ($resource) {
+                    Transport::set($localRefPrefix, $resource->getData());
+                }
             }
         }
 
@@ -65,7 +67,6 @@ class Element
         if ($result === false) {
             return false;
         }
-        unset($sourceElement['assert']);
 
         if ($tag == 'ui') {
             $uiTypeRender = $this->getUiTypeRender($this->getAttribute($sourceElement, 'type'));
@@ -87,8 +88,7 @@ class Element
             $resultElement['local_reference_prefix'] = $localRefPrefix;
         }
 
-        if ($this->getAttribute($sourceElement, 'collection')) {
-            $collectionUri = $this->getAttribute($sourceElement, 'collection');
+        if ($collectionUri = $this->getAttribute($sourceElement, 'collection')) {
             if ($localRefPrefix) {
                 $collectionUri = $localRefPrefix . '/' . $collectionUri;
             }

@@ -1,7 +1,7 @@
 <?php
 
 require_once 'bootstrap.php';
-
+$sum = 0;
 $startTime = microtime(true);
 
 $context = new Ff\Lib\Context(
