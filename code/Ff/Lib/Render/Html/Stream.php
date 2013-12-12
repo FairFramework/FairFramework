@@ -1,9 +1,9 @@
 <?php
 
-namespace Ff\Lib\Render\Html\Template;
+namespace Ff\Lib\Render\Html;
 
 use Ff\Lib\Data;
-use Ff\Lib\Render\Html\Template\Configuration;
+use Ff\Lib\Render\Html\Template;
 use Ff\Lib\Render\Html\Template\Transport;
 
 class Stream
@@ -58,61 +58,22 @@ class Stream
 
             $filteredTemplates = array_diff($templates, array($originalPath));
 
-            $original = new Configuration($this->bus);
-            $original->load($originalPath);
+            $template = new Template($this->bus);
+            $template->load($originalPath);
 
             if ($filteredTemplates) {
-                foreach ($filteredTemplates as $template) {
-                    $content = new Configuration($this->bus);
-                    $content->load($template);
-                    $original->extend($content);
+                foreach ($filteredTemplates as $path) {
+                    $content = new Template($this->bus);
+                    $content->load($path);
+                    $root = $content->getRoot();
+                    $template->extend($root);
                 }
             }
 
-            self::$templates[$this->path] = $original;
+            self::$templates[$this->path] = $template;
         }
 
-        $globalData = Transport::get('globalData');
-        $data = Transport::get($this->path);
-        if ($data === null) {
-            $data = $globalData;
-        }
-
-        $resultTemplate = self::$templates[$this->path]->toHtml(null, 0, $data, $globalData);
-
-        return $resultTemplate;
-    }
-    
-    private function replace($matches)
-    {
-        $arguments = $this->parseArguments($matches[2]);
-        if (isset($arguments['ui-type'])) {
-            $value = $matches[3];
-            $uiTypeRender = $this->getUiTypeRender($arguments);
-            return $uiTypeRender->render($value, $arguments);
-        }
-        return $matches[0];
-    }
-
-    private function parseArguments($rawArguments)
-    {
-        $arguments = array();
-        preg_match_all('#(.*?)="(.*?)"#', $rawArguments, $matches);
-        if ($matches) {
-            $arguments = array_combine($matches[1], $matches[2]);
-        }
-        return $arguments;
-    }
-
-    private function getUiTypeRender($arguments)
-    {
-        $uiType = isset($arguments['ui-type']) ? $arguments['ui-type'] : 'text';
-        if (!isset(self::$renders[$uiType])) {
-            $uiType = str_replace('_', '/', $uiType);
-            self::$renders[$uiType] = $this->bus->getInstance('ui/' . $uiType);
-        }
-
-        return self::$renders[$uiType];
+        return self::$templates[$this->path]->render();
     }
 
     /**

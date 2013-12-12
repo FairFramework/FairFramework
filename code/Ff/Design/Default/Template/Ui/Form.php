@@ -1,12 +1,12 @@
 <ul class="list-unstyled list-group-item">
     <li>
-        <p>@(label)</p>
-        <div dataCollection="attributes/items">
+        <p>{label}</p>
+        <div collection="attributes/items">
             <div class="form-group">
-                <label for="input-@(id)">@(label)</label>
-                <input uiType="form_input" id="input-@(id)" type="text" class="form-control" value="@(value)" />
+                <label for="input-@(id)">{label}</label>
+                <ui type="form_input" id="input-{id}" class="form-control" value="{value}" />
             </div>
         </div>
-        <ul if="@(items)" uiType="form" dataCollection="items"></ul>
+        <ui assert="{items}" type="form" collection="items"></ui>
     </li>
 </ul>

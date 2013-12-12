@@ -4,7 +4,7 @@
     <command label="Commands" type="collection">
         <create label="Create">
             <attributes label="Attributes">
-                <class>Ff\Lib\Command\Create</class>
+                <class type="text">Ff\Lib\Command\Create</class>
                 <is_secure type="bool">1</is_secure>
             </attributes>
         </create>

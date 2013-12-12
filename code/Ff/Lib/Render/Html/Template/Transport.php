@@ -2,17 +2,31 @@
 
 namespace Ff\Lib\Render\Html\Template;
 
+use Ff\Lib\Data;
+
 class Transport
 {
-    private static $data = array();
-    
-    public static function set($key, $data)
+    static $data;
+
+    private static function getData()
     {
-        self::$data[$key] = $data;
+        if (!isset(self::$data)) {
+            self::$data = new Data();
+        }
+
+        return self::$data;
     }
-    
-    public static function get($key)
+    public static function set($key, $value)
     {
-        return isset(self::$data[$key]) ? self::$data[$key] : null;
+        $data = self::getData();
+        $data->__set($key, $value);
+    }
+
+
+    public static function get($key, $default = null)
+    {
+        $data = self::getData();
+
+        return $data->get($key, $default);
     }
 }

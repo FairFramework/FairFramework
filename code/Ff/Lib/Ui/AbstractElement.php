@@ -4,8 +4,9 @@ namespace Ff\Lib\Ui;
 
 use Ff\Lib\Bus;
 use Ff\Lib\Data;
-use Ff\Lib\Render\Html\Template\Stream;
+use Ff\Lib\Render\Html\Stream;
 use Ff\Lib\Render\Html\Template\Transport;
+use Ff\Lib\Render\Html\Template;
 
 abstract class AbstractElement
 {
@@ -31,28 +32,45 @@ abstract class AbstractElement
         $this->config = $configuration;
     }
 
-    public function render(Data $data, Data $attributes, Data $globalData)
+    public function prepare(\SimpleXMLElement $sourceElement)
     {
-        $template = isset($attributes->uiTemplate)
-            ? $attributes->uiTemplate
+        $template = $this->getAttribute($sourceElement, 'uiTemplate')
+            ? $this->getAttribute($sourceElement, 'uiTemplate')
+            : $this->config->get('attributes/template');
+        $path = DIR_CODE . 'Ff/Design/' . Transport::get('global/uiTheme') . '/Template/' . $template . '.php';
+
+        $uiTemplate = new Template($this->bus);
+        $uiTemplate->load($path);
+
+        $uiTemplate->extend($sourceElement);
+
+        $uiTemplate->prepare();
+
+        return $uiTemplate->getRoot();
+    }
+
+    public function render(\SimpleXMLElement $element, Data $data, Data $globalData)
+    {
+        $template = $this->getAttribute($element, 'uiTemplate')
+            ? $this->getAttribute($element, 'uiTemplate')
             : $this->config->get('attributes/template');
         $path = DIR_CODE . 'Ff/Design/' . $globalData->uiTheme . '/Template/' . $template . '.php';
 
-        return $this->renderTemplate($path, $data, $attributes);
+        return $this->renderTemplate($path, $data, $element);
     }
 
-    protected function renderTemplate($path, Data $data, Data $attributes)
+    protected function renderTemplate($path, Data $data, \SimpleXMLElement $element)
     {
         $stream = new Stream();
 
-        if ($attributes->resource) {
-            $resourceIdentity = $attributes->resource;
+        if ($this->getAttribute($element, 'resource')) {
+            $resourceIdentity = $this->getAttribute($element, 'resource');
             $resource = $this->bus->getInstance($resourceIdentity);
             $dataToRender = $resource->getData();
             Transport::set($path, $dataToRender);
             return $stream->render($path);
-        } elseif ($attributes->dataCollection) {
-            $resourceName = $attributes->dataCollection;
+        } elseif ($this->getAttribute($element, 'dataCollection')) {
+            $resourceName = $this->getAttribute($element, 'dataCollection');
             $dataToRender = $data->get($resourceName);
             $result = '';
             foreach ($dataToRender as $dataItem) {
@@ -64,8 +82,6 @@ abstract class AbstractElement
             Transport::set($path, $data);
             return $stream->render($path);
         }
-
-        return '';
     }
 
     protected function getAttributesHtml(array $attributes)

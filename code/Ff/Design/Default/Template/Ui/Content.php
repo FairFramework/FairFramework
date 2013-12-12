@@ -4,6 +4,6 @@
             <label for="input@(id)">@(label)</label>
             <input id="input@(id)" type="text" class="form-control" value="@(value)" />
         </div>
-        <ul if="@(items)" uiType="content" dataCollection="items"></ul>
+        <ul uiType="content" dataCollection="items"></ul>
     </li>
 </ul>

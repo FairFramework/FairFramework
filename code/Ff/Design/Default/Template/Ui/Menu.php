@@ -6,21 +6,21 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">@(title)</a>
+        <a class="navbar-brand" href="#">{label}</a>
     </div>
     <div class=" collapse navbar-collapse">
-        <ul class="nav navbar-nav" dataCollection="items">
-            <li nif="@(items)">
-                <a href="$(system/base_url)@(uri)">@(label)</a>
+        <ul class="nav navbar-nav" collection="items">
+            <li assert="!{items}">
+                <a href="[system/base_url]{uri}">{label}</a>
             </li>
-            <li if="@(items)">
+            <li assert="{items}">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                    <span>@(label)</span>
+                    <span>{label}</span>
                     <b class="caret"></b>
                 </a>
-                <ul class="dropdown-menu" role="menu" dataCollection="items">
+                <ul class="dropdown-menu" role="menu" collection="items">
                     <li>
-                        <a href="$(system/base_url)@(uri)">@(label)</a>
+                        <a href="[system/base_url]{uri}">@(label)</a>
                     </li>
                 </ul>
             </li>

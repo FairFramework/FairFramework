@@ -10,11 +10,6 @@ class Data extends \stdClass
             $this->__set($key, $value);
         }
     }
-    
-    public function __clone()
-    {
-        //
-    }
 
     public function __set($path, $value)
     {
@@ -26,14 +21,20 @@ class Data extends \stdClass
             }
         } else {
             $pathArray = explode('/', $path);
-            $object = $this;
-            foreach ($pathArray as $key) {
-                if (isset($object->$key)) {
-                    $object = $object->$key;
-                } else {
-                    $object->$key = new Data();
-                    $object = $object->$key;
+            if ($pathArray) {
+                $object = $this;
+                $prev = $this;
+                foreach ($pathArray as $key) {
+                    $prev = $object;
+                    if (isset($object->$key)) {
+                        $object = $object->$key;
+                    } else {
+                        $object->$key = new Data();
+                        $object = $object->$key;
+                    }
+                    // @TODO
                 }
+                $prev->$key = $value;
             }
         }
     }
@@ -50,6 +51,11 @@ class Data extends \stdClass
         }
         
         return $this->getByPath($key, $default);
+    }
+
+    public function __toString()
+    {
+        return '[Data Object]';
     }
 
     public function extend(Data $data)

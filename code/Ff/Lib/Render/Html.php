@@ -4,6 +4,7 @@ namespace Ff\Lib\Render;
 
 use Ff\Lib\Bus;
 use Ff\Lib\Data;
+use Ff\Lib\Render\Html\Stream;
 use Ff\Lib\Resource;
 use Ff\Lib\Render\Html\Template\Transport;
 
@@ -29,7 +30,7 @@ class Html
         $this->bus = $bus;
         $this->config = $configuration;
 
-        stream_register_wrapper('ff.template.html', 'Ff\Lib\Render\Html\Template\Stream');
+        stream_register_wrapper('ff.template.html', 'Ff\Lib\Render\Html\Stream');
     }
 
     public function render(Resource $resource)
@@ -39,20 +40,16 @@ class Html
 
         $path = DIR_CODE . 'Ff/Design/' . $uiTheme . '/Template/' . $uiTemplate .'.php';
 
-        $data = new Data();
+        $data = array('uiTheme' => $uiTheme);
 
-        $code = $resource->getCode();
-        $data->$code = $resource;
-
-        $data->system = $this->getSystemData();
-
-        $data->uiTheme = $uiTheme;
-
-        Transport::set('globalData', $data);
+        Transport::set('global', $data);
+        Transport::set('system', $this->getSystemData());
+        Transport::set($resource->getCode(), $resource);
 
         echo '<!DOCTYPE html>' . "\n";
 
-        include 'ff.template.html://' . $path;
+        $stream = new Stream();
+        echo $stream->render($path);
     }
 
     private function getSystemData()
@@ -63,6 +60,6 @@ class Html
             'base_url' => FF_BASE_URL,
             'base_uri' => FF_BASE_URI
         );
-        return new Data($data);
+        return $data;
     }
 }
