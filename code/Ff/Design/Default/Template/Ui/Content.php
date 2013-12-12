@@ -1,9 +1,9 @@
-<ul class="list-unstyled list-group-item" dataCollection="attributes/items">
+<ul class="list-unstyled list-group-item" collection="attributes/items">
     <li>
         <div class="form-group">
-            <label for="input@(id)">@(label)</label>
-            <input id="input@(id)" type="text" class="form-control" value="@(value)" />
+            <label for="input{id}">{label}</label>
+            <input id="input{id}" type="text" class="form-control" value="{value}" />
         </div>
-        <ul uiType="content" dataCollection="items"></ul>
+        <ui type="content" collection="items" />
     </li>
 </ul>

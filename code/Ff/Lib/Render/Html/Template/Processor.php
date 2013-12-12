@@ -27,11 +27,12 @@ class Processor
 
     /**
      * @param \SimpleXMLElement $root
-     * @return \SimpleXMLElement
+     * @param null $localRefPrefix
+     * @return bool|\SimpleXMLElement
      */
-    public function prepare(\SimpleXMLElement $root)
+    public function prepare(\SimpleXMLElement $root, $localRefPrefix = null)
     {
-        return $this->elementProcessor->prepare($root);
+        return $this->elementProcessor->prepare($root, null, $localRefPrefix);
     }
 
     /**

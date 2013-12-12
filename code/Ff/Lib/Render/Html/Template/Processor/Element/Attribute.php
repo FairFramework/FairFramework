@@ -52,7 +52,10 @@ class Attribute
     {
         $value = isset($sourceElement['assert']) ? (string) $sourceElement['assert'] : '';
         if ($value) {
-            $value = preg_replace_callback('#(\!?)\{([/a-z]*)\}(=?)([a-z0-9]*)#',
+            if ($prefix) {
+                $prefix .= '/';
+            }
+            $value = preg_replace_callback('#(!?)\{([/a-z]*)\}(=?)([a-z0-9]*)#',
                 function ($matches) use ($prefix) {
                     return $this->assertCondition($matches[2], $matches[3], $matches[4], $matches[1], $prefix);
                 }

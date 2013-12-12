@@ -69,7 +69,7 @@ class Element
 
         if ($tag == 'ui') {
             $uiTypeRender = $this->getUiTypeRender($this->getAttribute($sourceElement, 'type'));
-            $sourceElement = $uiTypeRender->prepare($sourceElement);
+            $sourceElement = $uiTypeRender->prepare($sourceElement, $localRefPrefix);
         }
 
         if (isset($parent)) {
@@ -179,7 +179,7 @@ class Element
             return false;
         }
 
-        foreach ($element->children() as $k => $child) {
+        foreach ($element->children() as $child) {
             return true;
         }
 

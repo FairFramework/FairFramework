@@ -32,7 +32,7 @@ abstract class AbstractElement
         $this->config = $configuration;
     }
 
-    public function prepare(\SimpleXMLElement $sourceElement)
+    public function prepare(\SimpleXMLElement $sourceElement, $localRefPrefix = null)
     {
         $template = $this->getAttribute($sourceElement, 'uiTemplate')
             ? $this->getAttribute($sourceElement, 'uiTemplate')
@@ -44,7 +44,7 @@ abstract class AbstractElement
 
         $uiTemplate->extend($sourceElement);
 
-        $uiTemplate->prepare();
+        $uiTemplate->prepare($localRefPrefix);
 
         return $uiTemplate->getRoot();
     }

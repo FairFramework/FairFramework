@@ -73,9 +73,9 @@ class Template implements ConfigurationInterface
         return $this->root;
     }
 
-    public function prepare()
+    public function prepare($localRefPrefix = null)
     {
-        return $this->templateProcessor->prepare($this->root);
+        return $this->templateProcessor->prepare($this->root, $localRefPrefix);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

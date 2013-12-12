@@ -20,15 +20,37 @@ class Menu extends Resource
             'resource/content/menu' => array(
                 'label' => 'Menus',
                 'items' => array(
-                    array(
+                    'topmenu' => array(
                         'label' => 'Top Menu',
-                        'uri' => 'resource/content/menu/topmenu'
+                        'uri' => 'resource/content/menu/topmenu',
+                        'attributes' => array(
+                            'items' => array(
+                                'type' => array(
+                                    'label' => 'Type',
+                                    'value' => 'nav'
+                                )
+                            )
+                        ),
+                        'items' => array(
+                            'dashboard' => array(
+                                'label' => 'Dashboard',
+                                'uri' => 'resource/dashboard'
+                            ),
+                            'configuration' => array(
+                                'label' => 'Configuration',
+                                'uri' => 'resource/configuration'
+                            ),
+                            'content' => array(
+                                'label' => 'Content',
+                                'uri' => 'resource/content'
+                            )
+                        )
                     ),
-                    array(
+                    'bottommenu' => array(
                         'label' => 'Bottom Menu',
                         'uri' => 'resource/content/menu/bottommenu'
                     ),
-                    array(
+                    'promomenu' => array(
                         'label' => 'Promo Menu',
                         'uri' => 'resource/content/menu/promomenu'
                     )
