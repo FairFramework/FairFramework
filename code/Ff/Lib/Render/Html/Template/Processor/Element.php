@@ -14,11 +14,6 @@ class Element
     protected $bus;
 
     /**
-     * @var \Ff\Lib\Render\Html\Template\Processor\Element\Attribute
-     */
-    protected $attributeProcessor;
-
-    /**
      * @var \Ff\Lib\Ui\AbstractElement[]
      */
     private static $renders = array();
@@ -27,11 +22,12 @@ class Element
         'link', 'hr', 'meta', 'br'
     );
 
+    /**
+     * @param Bus $bus
+     */
     public function __construct(Bus $bus)
     {
         $this->bus = $bus;
-
-        $this->attributeProcessor = new Element\Attribute($bus);
     }
 
     /**
@@ -47,17 +43,15 @@ class Element
         if ($this->getAttribute($element, 'data')) {
             $value = $this->getAttribute($element, 'data');
             list($prefix, $uri) = explode(':', $value);
-            if (!Transport::get($prefix)) {
-                $uri = $this->attributeProcessor->processValue($uri);
-                $resource = $this->bus->getInstance($uri);
-                if ($resource) {
-                    Transport::set($prefix, $resource->getData());
-                }
+            $uri = $this->processTextValue($uri);
+            $resource = $this->bus->getInstance($uri);
+            if ($resource) {
+                Transport::set($prefix, $resource->getData());
             }
         }
 
         $assert = $this->getAttribute($element, 'assert');
-        $result = $this->attributeProcessor->processAssert($assert, $prefix);
+        $result = $this->processAssert($assert, $prefix);
         if ($result === false) {
             return false;
         }
@@ -80,7 +74,7 @@ class Element
 
         $result = $nl . $pad . '<' . $tag;
 
-        $result .= $this->attributeProcessor->process($element, $prefix);
+        $result .= $this->processAttributes($element, $prefix);
 
         if (in_array($tag, $this->singleTagElements)) {
             $result .= ' />';
@@ -110,14 +104,17 @@ class Element
             }
         }
 
-        $result .= $this->processTextValue($element, $prefix);
+        $value = trim((string)$element);
+        $result .= $this->processTextValue($value, $prefix);
 
         $result .= $nl . $pad . '</' . $tag . '>';
 
         return $result;
     }
 
-    protected function getAttribute(\SimpleXMLElement $element, $name, $ns = null)
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private function getAttribute(\SimpleXMLElement $element, $name, $ns = null)
     {
         if ($ns) {
             $attributes = $element->attributes($ns, true);
@@ -128,7 +125,7 @@ class Element
         return isset($attributes[$name]) ? (string)$attributes[$name] : null;
     }
 
-    protected function hasChildren(\SimpleXMLElement $element)
+    private function hasChildren(\SimpleXMLElement $element)
     {
         if (!$element->children()) {
             return false;
@@ -141,7 +138,7 @@ class Element
         return false;
     }
 
-    protected function getUiTypeRender($uiType)
+    private function getUiTypeRender($uiType)
     {
         if (!isset(self::$renders[$uiType])) {
             $uiType = str_replace('_', '/', $uiType);
@@ -151,21 +148,85 @@ class Element
         return self::$renders[$uiType];
     }
 
-    protected function processTextValue(\SimpleXMLElement $element, $prefix)
+    private function processAssert($value, $prefix)
     {
-        $value = trim((string)$element);
+        if ($value) {
+            if ($prefix) {
+                $prefix .= '/';
+            }
+            $value = preg_replace_callback('#(!?)\{([/a-z]*)\}(=?)([a-z0-9]*)#',
+                function ($matches) use ($prefix) {
+                    return $this->assertCondition($matches[2], $matches[3], $matches[4], $matches[1], $prefix);
+                }
+                , $value);
+
+            $value = preg_replace_callback('#(\!?)\[([/a-z]*+)\](=?)([a-z0-9]+$)#',
+                function ($matches) {
+                    return $this->assertCondition($matches[2], $matches[3], $matches[4], $matches[1]);
+                }, $value);
+
+            if ($value === '__SKIP__') {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    private function assertCondition($var, $operand, $compare, $denial, $prefix = '')
+    {
+        $result = false;
+        $value = Transport::get($prefix . $var);
+        if ($operand) {
+            switch ($operand) {
+                case '=':
+                    if ($value === $compare) {
+                        $result = true;
+                    }
+                    break;
+                case '>':
+                    if ($value > $compare) {
+                        $result = true;
+                    }
+                    break;
+                case '<':
+                    if ($value < $compare) {
+                        $result = true;
+                    }
+                    break;
+            }
+        }  else {
+            $result = !empty($value);
+        }
+
+        if ($denial) {
+            $result = !$result;
+        }
+
+        if ($result) {
+            return '__CONTINUE__';
+        } else {
+            return '__SKIP__';
+        }
+    }
+
+    private function processTextValue($value, $prefix = null)
+    {
         if (strlen($value)) {
             if ($prefix) {
                 $prefix .= '/';
             }
             $localReplace = function ($matches) use($prefix) {
-                return $this->replaceWithData($matches[1], $prefix);
+                $search = $prefix . $matches[1];
+                return Transport::get($search);
             };
 
             $value = preg_replace_callback('#\{(.*?)\}#', $localReplace, $value);
 
-            $globalReplace = function ($matches) use($prefix) {
-                return $this->replaceWithData($matches[1], $prefix);
+            $globalReplace = function ($matches) {
+                return Transport::get($matches[1]);
             };
 
             $value = preg_replace_callback('#\[(.*?)\]#', $globalReplace, $value);
@@ -176,25 +237,8 @@ class Element
         return $value;
     }
 
-    protected function replaceWithData($search, $prefix)
+    private function xmlEntities($value)
     {
-        $search = $prefix . $search;
-        return Transport::get($search);
-    }
-
-    /**
-     * Converts meaningful xml characters to xml entities
-     *
-     * @param  string
-     * @return string
-     */
-    protected function xmlEntities($value = null)
-    {
-        if (is_null($value)) {
-            $value = $this;
-        }
-        $value = (string)$value;
-
         $value = str_replace(
             array('&', '"', "'", '<', '>'),
             array('&amp;', '&quot;', '&apos;', '&lt;', '&gt;'),
@@ -202,5 +246,20 @@ class Element
         );
 
         return $value;
+    }
+
+    private function processAttributes(\SimpleXMLElement $element, $prefix)
+    {
+        $result = '';
+
+        $attributes = $element->attributes();
+        if ($attributes) {
+            foreach ($attributes as $key => $value) {
+                $value = $this->processTextValue($value, $prefix);
+                $result .= ' ' . $key . '="' . str_replace('"', '\"', $value) . '"';
+            }
+        }
+
+        return $result;
     }
 }

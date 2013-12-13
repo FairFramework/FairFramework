@@ -7,7 +7,7 @@ use Ff\Lib\Bus;
 use Ff\Lib\Data;
 use Ff\Lib\Render\Html\Template\Processor;
 
-class Template implements ConfigurationInterface
+class Template
 {
     /**
      * @var \Ff\Lib\Ui\AbstractElement[]
@@ -33,6 +33,10 @@ class Template implements ConfigurationInterface
         'link', 'hr', 'meta', 'br'
     );
 
+    /**
+     * @param Bus $bus
+     * @param \SimpleXMLElement $element
+     */
     public function __construct(Bus $bus, \SimpleXMLElement $element = null)
     {
         $this->bus = $bus;
@@ -42,6 +46,9 @@ class Template implements ConfigurationInterface
         $this->root = $element;
     }
 
+    /**
+     * @param null $filePath
+     */
     public function load($filePath = null)
     {
         if ($filePath === null) {
@@ -51,8 +58,14 @@ class Template implements ConfigurationInterface
         $this->root = simplexml_load_file($filePath);
     }
 
+    /**
+     * @param \SimpleXMLElement $element
+     * @param bool $overwrite
+     * @return $this
+     */
     public function extend(\SimpleXMLElement $element, $overwrite = false)
     {
+        // extended elements should contain declaration starting from root
         $this->updateAttributes($this->root, $element, $overwrite);
 
         foreach ($element->children() as $child) {
@@ -62,40 +75,15 @@ class Template implements ConfigurationInterface
         return $this;
     }
 
+    /**
+     * @return \SimpleXMLElement
+     */
     public function getRoot()
     {
         return $this->root;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public function get($path)
-    {
-        $element = $this->findElement($path);
-        if ($element) {
-            $result = $this->convert($element);
-        } else {
-            $result = null;
-        }
-        return $result;
-    }
-
-    public function findElement($path)
-    {
-        if ($path === null) {
-            return $this->root;
-        }
-        $pathArr = explode('/', $path);
-
-        $element = $this->root;
-        foreach ($pathArr as $nodeName) {
-            $element = $element->$nodeName;
-            if (!$element) {
-                return false;
-            }
-        }
-        return $element;
-    }
 
     private function extendElement(\SimpleXMLElement $target, \SimpleXMLElement $element, $overwrite = false)
     {
@@ -166,6 +154,12 @@ class Template implements ConfigurationInterface
         return $this;
     }
 
+    private function getAttribute(\SimpleXMLElement $element, $name)
+    {
+        $attributes = $element->attributes();
+        return isset($attributes[$name]) ? (string)$attributes[$name] : null;
+    }
+
     private function createElement(\SimpleXMLElement  $target, \SimpleXMLElement $element, $overwrite)
     {
         $elementName = $element->getName();
@@ -184,13 +178,6 @@ class Template implements ConfigurationInterface
         }
     }
 
-    private function updateAttributes(\SimpleXMLElement  $target, \SimpleXMLElement $element, $overwrite)
-    {
-        foreach ($element->attributes() as $key => $value) {
-            $target[$key] = $this->xmlentities($value);
-        }
-    }
-
     private function updateElement(\SimpleXMLElement  $target, \SimpleXMLElement $element, $overwrite)
     {
         $this->updateAttributes($target, $element, $overwrite);
@@ -202,29 +189,14 @@ class Template implements ConfigurationInterface
         }
     }
 
-    public function getAttribute(\SimpleXMLElement $element, $name)
+    private function updateAttributes(\SimpleXMLElement  $target, \SimpleXMLElement $element, $overwrite)
     {
-        $attributes = $element->attributes();
-        return isset($attributes[$name]) ? (string)$attributes[$name] : null;
-    }
-
-    protected function convert(\SimpleXMLElement $element)
-    {
-        $result = null;
-
-        if ($this->hasChildren($element)) {
-            $result = array();
-            foreach ($element->children() as $childName => $child) {
-                $result[$childName] = $this->convert($child);
-            }
-        } else {
-            $result = (string) $element;
+        foreach ($element->attributes() as $key => $value) {
+            $target[$key] = $value;
         }
-
-        return $result;
     }
 
-    protected function hasChildren(\SimpleXMLElement $element)
+    private function hasChildren(\SimpleXMLElement $element)
     {
         if (!$element->children()) {
             return false;
@@ -235,64 +207,5 @@ class Template implements ConfigurationInterface
         }
 
         return false;
-    }
-
-    /**
-     * Converts meaningful xml characters to xml entities
-     *
-     * @param  string
-     * @return string
-     */
-    private function xmlentities($value = null)
-    {
-        if (is_null($value)) {
-            $value = $this;
-        }
-        $value = (string)$value;
-
-        $value = str_replace(
-            array('&', '"', "'", '<', '>'),
-            array('&amp;', '&quot;', '&apos;', '&lt;', '&gt;'),
-            $value
-        );
-
-        return $value;
-    }
-
-    private function replaceWithData($search, $data, $attribute)
-    {
-        $search = (string) $search;
-        $result = $data->get($search);
-        if ($result) {
-            if (in_array($attribute, array('if', 'nif'))) {
-                return true;
-            }
-            return $result;
-        } else {
-            return null;
-        }
-    }
-
-    private function assertCondition($search, $compare, $data)
-    {
-        $search = (string) $search;
-        $result = $data->get($search);
-        if ($result === $compare) {
-            return 'CONTINUE';
-        } elseif (!$result && !$compare) {
-            return 'CONTINUE';
-        } else {
-            return 'SKIP';
-        }
-    }
-
-    private function getUiTypeRender($uiType)
-    {
-        if (!isset(self::$renders[$uiType])) {
-            $uiType = str_replace('_', '/', $uiType);
-            self::$renders[$uiType] = $this->bus->getInstance('ui/' . $uiType);
-        }
-
-        return self::$renders[$uiType];
     }
 }

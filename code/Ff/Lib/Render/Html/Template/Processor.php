@@ -18,6 +18,9 @@ class Processor
      */
     protected $elementProcessor;
 
+    /**
+     * @param Bus $bus
+     */
     public function __construct(Bus $bus)
     {
         $this->bus = $bus;

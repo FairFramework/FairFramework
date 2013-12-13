@@ -13,7 +13,10 @@ class View
      * @var Bus
      */
     private $bus;
-    
+
+    /**
+     * @param Bus $bus
+     */
     public function __construct(Bus $bus)
     {
         $this->bus = $bus;

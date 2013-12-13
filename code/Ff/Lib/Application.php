@@ -28,12 +28,18 @@ class Application
      * @var Bus
      */
     private $bus;
-    
+
+    /**
+     * @param Bus $bus
+     */
     public function __construct(Bus $bus)
     {
         $this->bus = $bus;
     }
 
+    /**
+     *
+     */
     public function start()
     {
         $context = $this->bus->context();
@@ -65,17 +71,25 @@ class Application
         }
     }
 
+    /**
+     * @param $uri
+     */
     public function redirect($uri)
     {
         //
     }
 
+    /**
+     * @param Resource $resource
+     */
     public function render(Resource $resource)
     {
         $context = $this->bus->context();
 
         $type = $context->getParam('render_type', 'html');
 
-        $this->bus->render()->$type()->render($resource);
+        $result = $this->bus->render()->$type()->render($resource);
+        // to have ability setting headers on application level
+        echo $result;
     }
 }

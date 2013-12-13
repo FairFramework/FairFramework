@@ -34,7 +34,13 @@ class Menu extends Resource
                         'items' => array(
                             'dashboard' => array(
                                 'label' => 'Dashboard',
-                                'uri' => 'resource/dashboard'
+                                'uri' => 'resource/dashboard',
+                                'items' => array(
+                                    array(
+                                        'label' => 'My Dashboard',
+                                        'uri' => 'resource/dashboard/my'
+                                    )
+                                )
                             ),
                             'configuration' => array(
                                 'label' => 'Configuration',
@@ -69,7 +75,13 @@ class Menu extends Resource
                 'items' => array(
                     array(
                         'label' => 'Dashboard',
-                        'uri' => 'resource/dashboard'
+                        'uri' => 'resource/dashboard',
+                        'items' => array(
+                            array(
+                                'label' => 'My Dashboard',
+                                'uri' => 'resource/dashboard/my'
+                            )
+                        )
                     ),
                     array(
                         'label' => 'Configuration',

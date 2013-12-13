@@ -33,6 +33,10 @@ class Html
         stream_register_wrapper('ff.template.html', 'Ff\Lib\Render\Html\Stream');
     }
 
+    /**
+     * @param Resource $resource
+     * @return string
+     */
     public function render(Resource $resource)
     {
         $uiTheme = $resource->config->get('ui_theme', 'Default');
@@ -40,26 +44,23 @@ class Html
 
         $path = DIR_CODE . 'Ff/Design/' . $uiTheme . '/Template/' . $uiTemplate .'.php';
 
-        $data = array('uiTheme' => $uiTheme);
+        $global = array('uiTheme' => $uiTheme);
+        Transport::set('global', $global);
 
-        Transport::set('global', $data);
-        Transport::set('system', $this->getSystemData());
-        Transport::set($resource->getCode(), $resource);
-
-        echo '<!DOCTYPE html>' . "\n";
-
-        $stream = new Stream();
-        echo $stream->render($path);
-    }
-
-    private function getSystemData()
-    {
-        $data = array(
+        $system = array(
             'charset' => 'utf-8',
             'lang' => 'en',
             'base_url' => FF_BASE_URL,
             'base_uri' => FF_BASE_URI
         );
-        return $data;
+        Transport::set('system', $system);
+
+        Transport::set($resource->getCode(), $resource);
+
+        $result = '<!DOCTYPE html>' . "\n";
+
+        $stream = new Stream();
+        $result .= $stream->render($path);
+        return $result;
     }
 }
