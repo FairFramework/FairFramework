@@ -20,37 +20,30 @@ class Attribute
     }
 
     /**
-     * @param \SimpleXMLElement $resultElement
-     * @param \SimpleXMLElement $sourceElement
+     * @param \SimpleXMLElement $element
      * @param $prefix
-     * @return bool
+     * @return string
      */
-    public function prepare(\SimpleXMLElement $resultElement,\SimpleXMLElement $sourceElement, $prefix)
+    public function process(\SimpleXMLElement $element, $prefix)
     {
-        $attributes = $sourceElement->attributes();
+        $result = '';
+
+        $attributes = $element->attributes();
         if ($attributes) {
             if ($prefix) {
                 $prefix .= '/';
             }
-
             foreach ($attributes as $key => $value) {
-                $method = 'prepareAttribute' . ucfirst($key);
-                if (!method_exists($this, $method)) {
-                    $method = 'prepareAttributeGeneric';
-                }
-
-                $value = $this->$method($key, $value, $prefix);
-
-                $resultElement->addAttribute($key, $value);
+                $value = $this->processValue($value, $prefix);
+                $result .= ' ' . $key . '="' . str_replace('"', '\"', $value) . '"';
             }
         }
 
-        return true;
+        return $result;
     }
 
-    public function assert(\SimpleXMLElement $sourceElement, $prefix)
+    public function processAssert($value, $prefix)
     {
-        $value = isset($sourceElement['assert']) ? (string) $sourceElement['assert'] : '';
         if ($value) {
             if ($prefix) {
                 $prefix .= '/';
@@ -76,42 +69,14 @@ class Attribute
         }
     }
 
-    public function prepareAttribute($name, $value, $prefix = null)
-    {
-        $method = 'prepareAttribute' . ucfirst($name);
-        if (!method_exists($this, $method)) {
-            $method = 'prepareAttributeGeneric';
-        }
-
-        return $this->$method($name, $value, $prefix);
-    }
-
-    /**
-     * @param \SimpleXMLElement $element
-     * @return string
-     */
-    public function render(\SimpleXMLElement $element)
-    {
-        $result = '';
-
-        $attributes = $element->attributes();
-        if ($attributes) {
-            foreach ($attributes as $key => $value) {
-                $result .= ' ' . $key . '="' . str_replace('"', '\"', $value) . '"';
-            }
-        }
-
-        return $result;
-    }
-
-    private function prepareAttributeGeneric($key, $value, $prefix)
+    public function processValue($value, $prefix = null)
     {
         $value = preg_replace_callback('#\{(.*?)\}#',
-            function ($matches) use ($key, $prefix) {
+            function ($matches) use ($prefix) {
                 return $this->resolveValue($matches[1], $prefix);
             }, $value);
         $value = preg_replace_callback('#\[(.*?)\]#',
-            function ($matches) use ($key) {
+            function ($matches) {
                 return $this->resolveValue($matches[1]);
             }
             , $value);

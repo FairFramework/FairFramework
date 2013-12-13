@@ -8,14 +8,14 @@
     <form id="page-form" enctype="multipart/form-data" action="" method="POST" role="form">
         <div id="page-container" class="container">
             <div id="page-header">
-                <ui type="menu" id="topmenu" local_reference_prefix="resource/content/menu/topmenu" />
+                <ui type="menu" id="topmenu" data="menu:resource/content/menu/topmenu" />
             </div>
             <div id="page-content" class="content row">
                 <div id="page-left" class="left col-md-4">
-                    <ui type="tree" id="configuration-tree" local_reference_prefix="resource/configuration"></ui>
+                    <ui type="tree" id="configuration-tree" data="tree:resource/configuration"></ui>
                 </div>
                 <div id="page-middle" class="middle jumbotron col-md-8">
-                    <ui type="form" id="configuration-form" local_reference_prefix="[system/base_uri]" />
+                    <ui type="form" id="configuration-form" data="form:[system/base_uri]" />
                 </div>
             </div>
             <div id="page-footer" class="panel-footer"></div>

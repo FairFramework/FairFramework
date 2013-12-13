@@ -11,7 +11,7 @@
     <div class=" collapse navbar-collapse">
         <ul class="nav navbar-nav" collection="items">
             <li assert="!{items}">
-                <a href="[system/base_url]{uri}">{label}</a>
+                <a href="[system/base_url]{uri}">{menu/label}</a>
             </li>
             <li assert="{items}">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">

@@ -35,93 +35,39 @@ class Element
     }
 
     /**
-     * @param \SimpleXMLElement $sourceElement
-     * @param \SimpleXMLElement $parent
-     * @param null $localRefPrefix
-     * @return bool|\SimpleXMLElement
-     */
-    public function prepare(\SimpleXMLElement $sourceElement, \SimpleXMLElement $parent = null, $localRefPrefix = null)
-    {
-        $tag = $sourceElement->getName();
-        if ($tag === 'data') {
-            $resourceName = (string)$sourceElement;
-            $resource = $this->bus->getInstance($resourceName);
-            if ($resource) {
-                Transport::set($this->getAttribute($sourceElement, 'name'), $resource->getData());
-            }
-            return false;
-        }
-
-        if ($this->getAttribute($sourceElement, 'local_reference_prefix')) {
-            $value = $this->getAttribute($sourceElement, 'local_reference_prefix');
-            $localRefPrefix = $this->attributeProcessor->prepareAttribute('local_reference_prefix', $value);
-            if (!Transport::get($localRefPrefix)) {
-                $resource = $this->bus->getInstance($localRefPrefix);
-                if ($resource) {
-                    Transport::set($localRefPrefix, $resource->getData());
-                }
-            }
-        }
-
-        $result = $this->attributeProcessor->assert($sourceElement, $localRefPrefix);
-        if ($result === false) {
-            return false;
-        }
-
-        if ($tag == 'ui') {
-            $uiTypeRender = $this->getUiTypeRender($this->getAttribute($sourceElement, 'type'));
-            $sourceElement = $uiTypeRender->prepare($sourceElement, $localRefPrefix);
-        }
-
-        if (isset($parent)) {
-            $resultElement = $parent->addChild($sourceElement->getName(), '');
-        } else {
-            $xml = "<{$sourceElement->getName()}></{$sourceElement->getName()}>";
-            $resultElement = new \SimpleXMLElement($xml);
-        }
-
-        $resultElement[0] = (string)$sourceElement;
-
-        $this->attributeProcessor->prepare($resultElement, $sourceElement, $localRefPrefix);
-
-        if ($localRefPrefix) {
-            $resultElement['local_reference_prefix'] = $localRefPrefix;
-        }
-
-        if ($collectionUri = $this->getAttribute($sourceElement, 'collection')) {
-            if ($localRefPrefix) {
-                $collectionUri = $localRefPrefix . '/' . $collectionUri;
-            }
-            $collection = Transport::get($collectionUri);
-            if ($collection) {
-                foreach ($collection as $id => $item) {
-                    if ($this->hasChildren($sourceElement)) {
-                        $_localRefPrefix = $collectionUri . '/' . $id;
-                        foreach ($sourceElement->children() as $child) {
-                            $this->prepare($child, $resultElement, $_localRefPrefix);
-                        }
-                    }
-                }
-            }
-        } else {
-            if ($this->hasChildren($sourceElement)) {
-                foreach ($sourceElement->children() as $child) {
-                    $this->prepare($child, $resultElement, $localRefPrefix);
-                }
-            }
-        }
-
-        return $resultElement;
-    }
-
-    /**
      * @param \SimpleXMLElement $element
      * @param int $level
      * @param null $prefix
      * @return string
      */
-    public function render(\SimpleXMLElement $element, $level = 0, $prefix = null)
+    public function process(\SimpleXMLElement $element, $level = 0, $prefix = null)
     {
+        $tag = $element->getName();
+
+        if ($this->getAttribute($element, 'data')) {
+            $value = $this->getAttribute($element, 'data');
+            list($prefix, $uri) = explode(':', $value);
+            if (!Transport::get($prefix)) {
+                $uri = $this->attributeProcessor->processValue($uri);
+                $resource = $this->bus->getInstance($uri);
+                if ($resource) {
+                    Transport::set($prefix, $resource->getData());
+                }
+            }
+        }
+
+        $assert = $this->getAttribute($element, 'assert');
+        $result = $this->attributeProcessor->processAssert($assert, $prefix);
+        if ($result === false) {
+            return false;
+        }
+
+        if ($tag == 'ui') {
+            $uiTypeRender = $this->getUiTypeRender($this->getAttribute($element, 'type'));
+            $element = $uiTypeRender->prepare($element, $prefix);
+            $tag = $element->getName();
+        }
+
         if (is_numeric($level)) {
             $pad = str_pad('', $level*3, ' ', STR_PAD_LEFT);
             $nl = "\n";
@@ -132,15 +78,9 @@ class Element
 
         $level++;
 
-        $prefix = ((string) $this->getAttribute($element, 'local_reference_prefix'))
-            ? ((string) $this->getAttribute($element, 'local_reference_prefix') . '/')
-            : $prefix;
-
-        $tag = $element->getName();
-
         $result = $nl . $pad . '<' . $tag;
 
-        $result .= $this->attributeProcessor->render($element);
+        $result .= $this->attributeProcessor->process($element, $prefix);
 
         if (in_array($tag, $this->singleTagElements)) {
             $result .= ' />';
@@ -150,8 +90,23 @@ class Element
         $result .= '>';
 
         if ($this->hasChildren($element)) {
-            foreach ($element->children() as $child) {
-                $result .= $pad . $this->render($child, $level, $prefix);
+            if ($collectionUri = $this->getAttribute($element, 'collection')) {
+                if ($prefix) {
+                    $collectionUri = $prefix . '/' . $collectionUri;
+                }
+                $collection = Transport::get($collectionUri);
+                if ($collection) {
+                    foreach ($collection as $id => $item) {
+                        $itemPrefix = $collectionUri . '/' . $id;
+                        foreach ($element->children() as $child) {
+                            $result .= $this->process($child, $level, $itemPrefix);
+                        }
+                    }
+                }
+            } else {
+                foreach ($element->children() as $child) {
+                    $result .= $pad . $this->process($child, $level, $prefix);
+                }
             }
         }
 
@@ -200,6 +155,9 @@ class Element
     {
         $value = trim((string)$element);
         if (strlen($value)) {
+            if ($prefix) {
+                $prefix .= '/';
+            }
             $localReplace = function ($matches) use($prefix) {
                 return $this->replaceWithData($matches[1], $prefix);
             };

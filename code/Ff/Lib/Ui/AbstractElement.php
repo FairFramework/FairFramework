@@ -44,8 +44,6 @@ abstract class AbstractElement
 
         $uiTemplate->extend($sourceElement);
 
-        $uiTemplate->prepare($localRefPrefix);
-
         return $uiTemplate->getRoot();
     }
 

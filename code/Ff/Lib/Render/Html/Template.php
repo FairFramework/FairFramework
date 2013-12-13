@@ -62,17 +62,6 @@ class Template implements ConfigurationInterface
         return $this;
     }
 
-    public function prepare($localRefPrefix = null)
-    {
-        return $this->templateProcessor->prepare($this->root, $localRefPrefix);
-    }
-
-    public function render()
-    {
-        $element = $this->prepare();
-        return $this->templateProcessor->render($element);
-    }
-
     public function getRoot()
     {
         return $this->root;

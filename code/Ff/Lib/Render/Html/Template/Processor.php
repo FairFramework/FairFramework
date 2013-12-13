@@ -26,21 +26,12 @@ class Processor
     }
 
     /**
-     * @param \SimpleXMLElement $root
-     * @param null $localRefPrefix
-     * @return bool|\SimpleXMLElement
-     */
-    public function prepare(\SimpleXMLElement $root, $localRefPrefix = null)
-    {
-        return $this->elementProcessor->prepare($root, null, $localRefPrefix);
-    }
-
-    /**
-     * @param \SimpleXMLElement $element
+     * @param Template $template
      * @return string
      */
-    public function render(\SimpleXMLElement $element)
+    public function process(Template $template)
     {
-        return $this->elementProcessor->render($element);
+        $root = $template->getRoot();
+        return $this->elementProcessor->process($root);
     }
 }
